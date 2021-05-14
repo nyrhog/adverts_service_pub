@@ -1,0 +1,48 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'com.project'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '15'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+allprojects{
+	apply plugin: 'java'
+	dependencies{
+		implementation 'org.projectlombok:lombok:1.18.16'
+		compileOnly 'org.projectlombok:lombok:1.18.16'
+		annotationProcessor 'org.projectlombok:lombok:1.18.16'
+		testCompileOnly 'org.projectlombok:lombok:1.18.16'
+		testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+	}
+}
+
+dependencies {
+
+	implementation(project(':model'))
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+test {
+	useJUnitPlatform()
+}

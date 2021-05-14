@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'com.project'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":model"))
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.4.5'
+}
+
+test {
+    useJUnitPlatform()
+}

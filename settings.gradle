@@ -1,0 +1,6 @@
+rootProject.name = 'adverts_service'
+include 'model'
+include 'repository'
+include 'api'
+include 'service'
+
