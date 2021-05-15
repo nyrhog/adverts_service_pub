@@ -2,6 +2,7 @@ package com.project.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Table(name = "users")
 @Getter
 @Setter
+@Accessors(chain = true)
 public class User {
 
     @Id
@@ -17,13 +19,13 @@ public class User {
     @SequenceGenerator(name = "user_seq", sequenceName = "SEQ_USER")
     private Long id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "is_active", nullable = false)

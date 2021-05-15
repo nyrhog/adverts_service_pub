@@ -32,12 +32,14 @@ allprojects{
 dependencies {
 
 	implementation(project(':model'))
+	implementation(project(':controller'))
+	implementation(project(':security'))
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'mysql:mysql-connector-java'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+//	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

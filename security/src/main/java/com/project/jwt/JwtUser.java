@@ -12,13 +12,15 @@ public class JwtUser implements UserDetails {
     private final String nickname;
     private final String email;
     private final String password;
+    private final Boolean isActive;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public JwtUser(Long id, String nickname, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public JwtUser(Long id, String nickname, String email, String password, Boolean isActive, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
+        this.isActive = isActive;
         this.authorities = authorities;
     }
 

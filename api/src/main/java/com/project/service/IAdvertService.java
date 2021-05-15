@@ -2,7 +2,7 @@ package com.project.service;
 
 
 
-public interface AdvertService {
+public interface IAdvertService {
 
     void createAdvert();
     void updateAdvert();

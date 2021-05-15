@@ -11,7 +11,8 @@ repositories {
 
 dependencies {
 
-    implementation(project(":api"))
+    compile(project(":api"))
+    compile(project(":service"))
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.4.5'
 }

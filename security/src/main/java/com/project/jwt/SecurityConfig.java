@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private static final String ADMIN_ENDPOINT = "/admin/**";
-    private static final String LOGIN_ENDPOINT = "/auth/login/**";
+    private static final String LOGIN_ENDPOINT = "/auth/**";
 
     @Bean
     @Override

@@ -2,6 +2,7 @@ package com.project.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -13,6 +14,7 @@ import java.util.List;
 @Table(name = "profiles")
 @Getter
 @Setter
+@Accessors(chain = true)
 public class Profile {
 
     @Id
@@ -30,9 +32,10 @@ public class Profile {
     private String phoneNumber;
 
     @Column(name = "rating")
-    @Size(min = 1, max = 5)
+//    @Size(min = 1, max = 5)
     private Double rating;
 
+    @org.hibernate.annotations.CreationTimestamp
     @Column(name = "create_date")
     private LocalDateTime created;
 
@@ -41,7 +44,7 @@ public class Profile {
 
     @OneToMany
     @JoinColumn(name = "advert_id")
-    private List<Advert> adverts;
+    private List<Advert> adverts = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "profile",

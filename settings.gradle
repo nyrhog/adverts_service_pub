@@ -4,4 +4,6 @@ include 'repository'
 include 'api'
 include 'service'
 include 'security'
+include 'controller'
+include 'configuration'
 

@@ -18,6 +18,7 @@ public class JwtUserFactory {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getIsActive(),
                 mapToGrantedAuthorities(user.getRoles())
         );
     }
