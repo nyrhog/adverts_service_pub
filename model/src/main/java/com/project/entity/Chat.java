@@ -13,7 +13,7 @@ public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chat_seq")
-    @SequenceGenerator(name = "chat_seq", sequenceName = "SEQ_CHAT")
+    @SequenceGenerator(name = "chat_seq", sequenceName = "SEQ_CHAT", allocationSize = 1)
     private Long id;
 
     @OneToMany(

@@ -2,6 +2,7 @@ package com.project.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,11 +13,12 @@ import java.util.List;
 @Table(name = "adverts")
 @Getter
 @Setter
+@Accessors(chain = true)
 public class Advert {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "adverts_seq")
-    @SequenceGenerator(name = "adverts_seq", sequenceName = "SEQ_ADVERTS")
+    @SequenceGenerator(name = "adverts_seq", sequenceName = "SEQ_ADVERTS", allocationSize = 1)
     private Long id;
 
     @Column(name = "ad_name", nullable = false)

@@ -19,7 +19,7 @@ public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_seq")
-    @SequenceGenerator(name = "profile_seq", sequenceName = "SEQ_PROFILE")
+    @SequenceGenerator(name = "profile_seq", sequenceName = "SEQ_PROFILE", allocationSize = 1)
     private Long id;
 
     @Column(name = "name")

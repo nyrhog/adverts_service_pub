@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
 

@@ -34,14 +34,7 @@ public class UserService implements IUserService {
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(userRoles);
-        user.setIsActive(true);
-
-        User registeredUser = userRepository.save(user);
-
-        log.info("IN register - user: {} successfully registered", registeredUser);
-        return registeredUser;
+        return getUser(user, userRoles);
     }
 
     @Override
@@ -62,5 +55,34 @@ public class UserService implements IUserService {
     @Override
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User registerAdminUser(User user) {
+        Role roleUser = roleRepository.findByName("ROLE_USER");
+        Role adminRoleUser = roleRepository.findByName("ROLE_ADMIN");
+
+        List<Role> userRoles = new ArrayList<>();
+        userRoles.add(roleUser);
+        userRoles.add(adminRoleUser);
+
+        return getUser(user, userRoles);
+    }
+
+    private User getUser(User user, List<Role> userRoles) {
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(userRoles);
+        user.setIsActive(true);
+
+        User registeredUser = userRepository.save(user);
+
+        log.info("IN register - user: {} successfully registered", registeredUser);
+        return registeredUser;
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(new User());
     }
 }

@@ -18,11 +18,6 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     private IUserService userService;
 
-//    @Autowired
-//    public JwtUserDetailsService(IUserService userService) {
-//        this.userService = userService;
-//    }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " not found"));

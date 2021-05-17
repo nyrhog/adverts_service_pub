@@ -17,4 +17,8 @@ public interface IUserService {
 
     void delete(Long id);
 
+    User registerAdminUser(User user);
+
+    User getUserById(Long id);
+
 }
