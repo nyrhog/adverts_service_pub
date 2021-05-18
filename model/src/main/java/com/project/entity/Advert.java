@@ -44,7 +44,7 @@ public class Advert {
     @Column(name = "close_date")
     private LocalDateTime closed;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "advert_premium_id", referencedColumnName = "id")
     private AdvertPremium advertPremium;
 
@@ -58,7 +58,7 @@ public class Advert {
 
     @OneToMany(
             mappedBy = "advert",
-            cascade = CascadeType.ALL,
+            cascade = {CascadeType.REMOVE, CascadeType.MERGE},
             orphanRemoval = true
     )
     private List<Comment> comments = new ArrayList<>();

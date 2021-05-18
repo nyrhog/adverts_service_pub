@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,8 +22,9 @@ public class Chat {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
-
+    @ManyToMany(mappedBy = "chats")
+    private List<Profile> profiles = new ArrayList<>();
 
 }

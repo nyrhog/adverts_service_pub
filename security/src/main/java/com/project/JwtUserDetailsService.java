@@ -1,6 +1,8 @@
 package com.project;
 
 import com.project.entity.User;
+import com.project.entity.UserStatus;
+import com.project.jwt.JwtAuthenticationException;
 import com.project.jwt.JwtUser;
 import com.project.jwt.JwtUserFactory;
 import com.project.service.IUserService;
@@ -11,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
+
 @Service
 @Slf4j
 public class JwtUserDetailsService implements UserDetailsService {
@@ -20,7 +24,12 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " not found"));
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " not found"));
+
+        if(user.getStatus() == UserStatus.DELETED){
+            throw new JwtAuthenticationException("User was already deleted");
+        }
 
         JwtUser jwtUser = JwtUserFactory.create(user);
         log.info("IN loadUserByUsername - user with username: {} successfully loaded", username);

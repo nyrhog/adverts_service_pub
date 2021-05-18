@@ -43,7 +43,7 @@ public class Profile {
     private LocalDateTime updated;
 
     @OneToMany
-    @JoinColumn(name = "advert_id")
+    @JoinColumn(name = "profile_id")
     private List<Advert> adverts = new ArrayList<>();
 
     @OneToMany(
@@ -60,7 +60,7 @@ public class Profile {
     )
     private List<Comment> comments = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "profiles_chats",
             joinColumns = {@JoinColumn(name = "profile_id")},

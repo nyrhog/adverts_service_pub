@@ -4,11 +4,13 @@ import com.project.dao.RoleRepository;
 import com.project.dao.UserRepository;
 import com.project.entity.Role;
 import com.project.entity.User;
+import com.project.entity.UserStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +56,10 @@ public class UserService implements IUserService {
 
     @Override
     public void delete(Long id) {
-        userRepository.deleteById(id);
+
+        User user = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        user.setStatus(UserStatus.DELETED);
+
     }
 
     @Override
@@ -73,7 +78,7 @@ public class UserService implements IUserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(userRoles);
-        user.setIsActive(true);
+        user.setStatus(UserStatus.ACTIVE);
 
         User registeredUser = userRepository.save(user);
 

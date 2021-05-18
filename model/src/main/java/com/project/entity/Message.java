@@ -14,31 +14,22 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 public class Message {
 
-    @EmbeddedId
-    private MessageId id;
+    @Id
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("profileId")
+    @JoinColumn(name = "profile_id")
     private Profile profile;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("chatId")
+    @JoinColumn(name = "chat_id")
     private Chat chat;
 
     @Column(name = "message_text")
     private String text;
 
+    @org.hibernate.annotations.CreationTimestamp
     @Column(name = "message_write_time")
     private LocalDateTime writeTime;
-
-    protected Message() {
-    }
-
-    public Message(Profile profile, Chat chat) {
-        this.profile = profile;
-        this.chat = chat;
-        this.id = new MessageId(profile.getId(), chat.getId());
-    }
-
 
 }

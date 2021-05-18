@@ -3,13 +3,11 @@ package com.project.controller;
 import com.project.dto.RegistrationDto;
 import com.project.entity.Profile;
 import com.project.entity.User;
+import com.project.service.IAdvertService;
 import com.project.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -18,10 +16,12 @@ import javax.validation.Valid;
 public class AdminController {
 
     private final IUserService userService;
+    private final IAdvertService advertService;
 
     @Autowired
-    public AdminController(IUserService userService) {
+    public AdminController(IUserService userService, IAdvertService advertService) {
         this.userService = userService;
+        this.advertService = advertService;
     }
 
     @PostMapping("/registration")
@@ -45,5 +45,12 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/premuim/{id}")
+    public ResponseEntity<Void> enablePremiumAdvert(@PathVariable Long id) {
+
+        advertService.enablePremiumStatus(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }

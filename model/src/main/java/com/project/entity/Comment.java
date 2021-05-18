@@ -14,20 +14,22 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 public class Comment {
 
-    @EmbeddedId
-    private CommentId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("profileId")
+    @JoinColumn(name = "profile_id")
     private Profile profile;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("advertId")
+    @JoinColumn(name = "advert_id")
     private Advert advert;
 
     @Column(name = "comment_text", nullable = false)
     private String commentText;
 
+    @org.hibernate.annotations.CreationTimestamp
     @Column(name = "comment_create")
     private LocalDateTime createDate;
 
@@ -37,12 +39,4 @@ public class Comment {
     @Column(name = "comment_delete")
     private LocalDateTime deleteDate;
 
-    protected Comment() {
-    }
-
-    public Comment(Profile profile, Advert advert) {
-        this.profile = profile;
-        this.advert = advert;
-        this.id = new CommentId(profile.getId(), advert.getId());
-    }
 }
