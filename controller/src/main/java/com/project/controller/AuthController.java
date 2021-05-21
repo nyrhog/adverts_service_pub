@@ -1,5 +1,6 @@
 package com.project.controller;
 
+import com.project.dao.ProfileRepository;
 import com.project.dto.AuthenticationRequestDto;
 import com.project.dto.RegistrationDto;
 import com.project.dto.ResponseDto;
@@ -8,17 +9,18 @@ import com.project.entity.User;
 import com.project.jwt.JwtTokenProvider;
 import com.project.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/auth")
@@ -26,6 +28,10 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final IUserService userService;
+
+    @Autowired
+    //todo удалить
+    private ProfileRepository profileRepository;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, IUserService userService) {
@@ -67,5 +73,14 @@ public class AuthController {
 
         userService.register(user);
         return ResponseEntity.noContent().build();
+    }
+
+//    todo удалить в самом конце, дерьмо для тестирования
+    @GetMapping("/profiles/{id}")
+    public ResponseEntity<Profile> getById(@PathVariable Long id){
+
+        Profile profile = profileRepository.findById(id).orElse(null);
+
+        return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 }

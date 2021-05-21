@@ -1,14 +1,15 @@
 package com.project.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "profiles")
@@ -22,18 +23,19 @@ public class Profile {
     @SequenceGenerator(name = "profile_seq", sequenceName = "SEQ_PROFILE", allocationSize = 1)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "surname")
+    @Column(name = "surname", nullable = false)
     private String surname;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "rating")
-//    @Size(min = 1, max = 5)
-    private Double rating;
+    @org.hibernate.annotations.Formula(
+           "(select avg(r.rating) from ratings r where r.profile_id = id)"
+    )
+    private Double ratingValue;
 
     @org.hibernate.annotations.CreationTimestamp
     @Column(name = "create_date")
@@ -48,7 +50,7 @@ public class Profile {
 
     @OneToMany(
             mappedBy = "profile",
-            cascade = CascadeType.ALL,
+            cascade = {CascadeType.REMOVE, CascadeType.MERGE},
             orphanRemoval = true
     )
     private List<Message> messages = new ArrayList<>();
@@ -67,4 +69,20 @@ public class Profile {
             inverseJoinColumns = {@JoinColumn(name = "chat_id")}
     )
     private List<Chat> chats = new ArrayList<>();
+
+    @OneToOne(mappedBy = "profile")
+    private User user;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Profile profile = (Profile) o;
+        return Objects.equals(id, profile.id) && Objects.equals(name, profile.name) && Objects.equals(surname, profile.surname) && Objects.equals(phoneNumber, profile.phoneNumber) && Objects.equals(ratingValue, profile.ratingValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, surname, phoneNumber, ratingValue);
+    }
 }

@@ -3,6 +3,7 @@ package com.project.service;
 import com.project.dao.ProfileRepository;
 import com.project.dto.ProfileUpdateDto;
 import com.project.entity.Profile;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,10 @@ import javax.persistence.EntityNotFoundException;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
-
-    @Autowired
-    public ProfileService(ProfileRepository profileRepository) {
-        this.profileRepository = profileRepository;
-    }
 
     public void updateProfile(ProfileUpdateDto updateDto) {
 

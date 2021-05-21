@@ -1,16 +1,16 @@
 package com.project.service;
 
 
-import com.project.dto.CommentaryDto;
-import com.project.dto.CreateAdvertDto;
-import com.project.dto.UpdateAdvertDto;
+import com.project.dto.*;
+import org.springframework.data.domain.Page;
 
 public interface IAdvertService {
 
     void createAdvert(CreateAdvertDto advertDto);
     void updateAdvert(UpdateAdvertDto advertDto);
-    void deleteAdvert(Long id);
+    void deleteAdvert(DeleteAdvertDto advertDto);
     void enablePremiumStatus(Long advertId);
     void addCommentaryToAdvert(CommentaryDto commentaryDto);
+    Page<AdvertDto> getAdverts(AdvertListDto advertDto);
 
 }

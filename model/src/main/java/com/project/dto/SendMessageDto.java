@@ -5,12 +5,11 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class CreateChatDto {
-
+public class SendMessageDto {
     @NotNull
-    private Long chatCreateProfileId;
-
+    private Long senderIdProfile;
     @NotNull
-    private Long chatWithProfileId;
-
+    private Long chatId;
+    @NotNull
+    private String text;
 }

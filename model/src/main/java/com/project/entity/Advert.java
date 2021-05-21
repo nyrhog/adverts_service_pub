@@ -38,7 +38,7 @@ public class Advert {
     @org.hibernate.annotations.CreationTimestamp
     private LocalDateTime created;
 
-    @Column(name = "update_name")
+    @Column(name = "update_date")
     private LocalDateTime updated;
 
     @Column(name = "close_date")
@@ -62,4 +62,8 @@ public class Advert {
             orphanRemoval = true
     )
     private List<Comment> comments = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
 }

@@ -10,6 +10,8 @@ import java.util.List;
 public class CreateAdvertDto {
 
     @NotNull
+    private String username;
+    @NotNull
     private Long profileId;
     @NotNull
     private String adName;
