@@ -7,7 +7,6 @@ import com.project.entity.*;
 import com.project.mapper.AdvertMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +29,8 @@ public class AdvertService implements IAdvertService {
     private final AdvertRepository advertsRepository;
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
-    private final CustomizedAdvertRepository<Advert> advertCustomizedAdvertRepository;
+    private final AdvertPremiumRepository advertPremiumRepository;
+    private final CustomizedAdvertRepository<Advert> customizedAdvertRepository;
     private final AdvertMapper mapper;
 
     @Value("${premiumDays}")
@@ -77,15 +76,15 @@ public class AdvertService implements IAdvertService {
         Double adPrice = advertDto.getAdPrice();
         String description = advertDto.getDescription();
 
-        if(adName != null){
+        if (adName != null) {
             advert.setAdName(adName);
         }
 
-        if(adPrice != null){
+        if (adPrice != null) {
             advert.setAdPrice(adPrice);
         }
 
-        if(description != null){
+        if (description != null) {
             advert.setDescription(description);
         }
 
@@ -139,24 +138,28 @@ public class AdvertService implements IAdvertService {
 
     //todo add to interface
     @Transactional
-    public void deleteComment(Long commentId){
+    public void deleteComment(Long commentId) {
         //todo exception message
-       Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotFoundException());
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotFoundException());
 
-       comment.getAdvert().getComments().remove(comment);
-       comment.getProfile().getComments().remove(comment);
+        comment.getAdvert().getComments().remove(comment);
+        comment.getProfile().getComments().remove(comment);
 
-       commentRepository.delete(comment);
+        commentRepository.delete(comment);
     }
 
     //todo add to interface
     @Transactional
-    public void editComment(EditCommentDto editCommentDto){
-        Comment comment = commentRepository.findById(editCommentDto.getCommentId()).orElseThrow(() -> new EntityNotFoundException());
+    public void editComment(EditCommentDto editCommentDto) {
+        Comment comment = commentRepository.findById(editCommentDto.getCommentId())
+                .orElseThrow(() -> new EntityNotFoundException());
         comment.setCommentText(editCommentDto.getNewCommentText());
     }
 
-    public Page<AdvertDto> getAdverts(AdvertListDto advertDto){
+    @Transactional
+    public Page<AdvertDto> getAdverts(AdvertListDto advertDto) {
+
+        disableExpiredPrems();
 
         Integer pageNumber = advertDto.getPageNumber();
         Integer pageSize = advertDto.getPageSize();
@@ -164,23 +167,36 @@ public class AdvertService implements IAdvertService {
         List<String> replacedCategories = replaceCharsInCategories(advertDto.getCategories());
 
         List<Category> categories = categoryRepository.findByCategoryNameIn(replacedCategories);
-        List<String> categoriesNames = categories.stream().map(Category::getCategoryName).collect(Collectors.toList());
+        List<String> categoriesNames = categories.stream()
+                .map(Category::getCategoryName)
+                .collect(Collectors.toList());
 
-        Page<Advert> adverts = advertCustomizedAdvertRepository.findAllByCategoriesIn(categoriesNames, PageRequest.of(pageNumber, pageSize));
+        Page<Advert> adverts = customizedAdvertRepository.findAllByCategoriesIn(categoriesNames,
+                                                                                PageRequest.of(pageNumber, pageSize));
 
         List<AdvertDto> advertDtoList = adverts.getContent()
                 .stream()
                 .map((mapper::toAdvertDto))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(advertDtoList, PageRequest.of(pageNumber, pageSize), advertDtoList.size());
+        return new PageImpl<>(advertDtoList, PageRequest.of(pageNumber, pageSize), adverts.getTotalElements());
     }
 
-    protected List<String> replaceCharsInCategories(List<String> categories){
+    protected List<String> replaceCharsInCategories(List<String> categories) {
         return categories.stream()
                 .map(category -> category.replace("_", " "))
                 .collect(Collectors.toList());
     }
 
+    protected void disableExpiredPrems() {
+
+        List<AdvertPremium> expiredPrems = advertPremiumRepository.getAllByPremEndLessThanAndIsActiveTrue(LocalDateTime.now());
+
+        expiredPrems.forEach((advertPremium -> {
+            advertPremium.setIsActive(false);
+            advertPremium.setPremStarted(null);
+        }));
+
+    }
 
 }
