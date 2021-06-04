@@ -2,6 +2,7 @@ package com.project.controller;
 
 import com.project.dto.*;
 import com.project.service.IAdvertService;
+import com.project.service.IProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -47,10 +48,30 @@ public class AdvertController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/comment")
+    @PatchMapping("/comment")
+    @PreAuthorize("#commentDto.username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> updateComment(@Valid @RequestBody EditCommentDto commentDto){
+
+        advertService.editComment(commentDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("#commentaryDto.username == authentication.principal.username")
+    @PostMapping("/comment")
     public ResponseEntity<Void> addComment(@Valid @RequestBody CommentaryDto commentaryDto){
 
         advertService.addCommentaryToAdvert(commentaryDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    //вопросы
+    @PreAuthorize("#username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/comment")
+    public ResponseEntity<Void> deleteComment(@RequestParam Long id,
+                                              @RequestParam String username){
+
+        advertService.deleteComment(id);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -58,15 +79,27 @@ public class AdvertController {
     public ResponseEntity<Page<AdvertDto>> getAdverts(@RequestParam String category,
                                                       @RequestParam Integer size,
                                                       @RequestParam Integer pageNumber)
+
     {
+        Integer realPage = pageNumber - 1;
         AdvertListDto advertListDto = new AdvertListDto();
         advertListDto.setCategories(List.of(category));
         advertListDto.setPageSize(size);
-        advertListDto.setPageNumber(pageNumber);
+        advertListDto.setPageNumber(realPage);
 
         Page<AdvertDto> adverts = advertService.getAdverts(advertListDto);
 
         return new ResponseEntity<>(adverts, HttpStatus.OK);
     }
 
+    @GetMapping("/history")
+    public ResponseEntity<Page<AdvertDto>> getAdvertsHistoryOfProfile(@RequestParam Long id,
+                                                      @RequestParam Integer size,
+                                                      @RequestParam Integer page)
+    {
+        Integer realPage = page - 1;
+
+        Page<AdvertDto> adverts = advertService.sellingHistory(id, realPage, size);
+        return new ResponseEntity<>(adverts, HttpStatus.OK);
+    }
 }

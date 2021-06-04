@@ -11,6 +11,9 @@ public interface IAdvertService {
     void deleteAdvert(DeleteAdvertDto advertDto);
     void enablePremiumStatus(Long advertId);
     void addCommentaryToAdvert(CommentaryDto commentaryDto);
+    void deleteComment(Long commentId);
+    void editComment(EditCommentDto editCommentDto);
     Page<AdvertDto> getAdverts(AdvertListDto advertDto);
+    Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size);
 
 }

@@ -4,6 +4,7 @@ import com.project.dto.CreateChatDto;
 import com.project.dto.SendMessageDto;
 import com.project.service.IChatService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,6 +20,7 @@ public class ChatController {
     }
 
     @PostMapping
+    @PreAuthorize("#createChatDto.username == authentication.principal.username")
     public ResponseEntity<Void> createChat(@RequestBody @Valid CreateChatDto createChatDto){
 
         chatService.createChat(createChatDto);
@@ -26,6 +28,7 @@ public class ChatController {
     }
 
     @PutMapping("/message")
+    @PreAuthorize("#sendMessageDto.username == authentication.principal.username")
     public ResponseEntity<Void> sendMessage(@RequestBody @Valid SendMessageDto sendMessageDto){
 
         chatService.sendMessage(sendMessageDto);

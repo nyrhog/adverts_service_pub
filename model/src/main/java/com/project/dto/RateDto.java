@@ -6,13 +6,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class EditCommentDto {
+public class RateDto {
 
     @NotBlank
     private String username;
     @NotNull
-    private Long commentId;
-    @NotBlank
-    private String newCommentText;
+    private Long profileId;
+    @NotNull
+    private Double rate;
 
 }

@@ -14,6 +14,9 @@ public class Rating {
     @Id
     private Long id;
 
+    @Column(name = "rating")
+    private Double rating;
+
     @ManyToOne
     @JoinColumn(name = "profile_id")
     private Profile profile;

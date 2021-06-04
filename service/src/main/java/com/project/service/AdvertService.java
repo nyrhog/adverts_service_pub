@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,17 +77,19 @@ public class AdvertService implements IAdvertService {
         Double adPrice = advertDto.getAdPrice();
         String description = advertDto.getDescription();
 
-        if (adName != null) {
-            advert.setAdName(adName);
-        }
+        mapper.updateAdvert(advert, advertDto);
 
-        if (adPrice != null) {
-            advert.setAdPrice(adPrice);
-        }
-
-        if (description != null) {
-            advert.setDescription(description);
-        }
+//        if (adName != null) {
+//            advert.setAdName(adName);
+//        }
+//
+//        if (adPrice != null) {
+//            advert.setAdPrice(adPrice);
+//        }
+//
+//        if (description != null) {
+//            advert.setDescription(description);
+//        }
 
         advert.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
     }
@@ -107,6 +110,7 @@ public class AdvertService implements IAdvertService {
 
     @Transactional
     @Override
+    //todo кастомизировать выдачу премиума
     public void enablePremiumStatus(Long advertId) {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
@@ -133,10 +137,9 @@ public class AdvertService implements IAdvertService {
 
         sender.getComments().add(comment);
         advert.getComments().add(comment);
-
     }
 
-    //todo add to interface
+    //todo посмотреть что там по id
     @Transactional
     public void deleteComment(Long commentId) {
         //todo exception message
@@ -148,7 +151,6 @@ public class AdvertService implements IAdvertService {
         commentRepository.delete(comment);
     }
 
-    //todo add to interface
     @Transactional
     public void editComment(EditCommentDto editCommentDto) {
         Comment comment = commentRepository.findById(editCommentDto.getCommentId())
@@ -159,6 +161,7 @@ public class AdvertService implements IAdvertService {
     @Transactional
     public Page<AdvertDto> getAdverts(AdvertListDto advertDto) {
 
+        //todo как оно отрабатывает
         disableExpiredPrems();
 
         Integer pageNumber = advertDto.getPageNumber();
@@ -189,14 +192,26 @@ public class AdvertService implements IAdvertService {
     }
 
     protected void disableExpiredPrems() {
-
         List<AdvertPremium> expiredPrems = advertPremiumRepository.getAllByPremEndLessThanAndIsActiveTrue(LocalDateTime.now());
 
         expiredPrems.forEach((advertPremium -> {
             advertPremium.setIsActive(false);
             advertPremium.setPremStarted(null);
         }));
+    }
 
+    @Override
+    @Transactional
+    public Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size){
+
+        Page<Advert> advertList = advertsRepository.getAllClosedAdvertsWithProfileId(profileId,
+                                                     PageRequest.of(page, size, Sort.by(Advert_.CLOSED).descending()));
+
+        List<AdvertDto> advertListDto = advertList.getContent().stream().
+                map(mapper::toAdvertDto)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(advertListDto, PageRequest.of(page, size), advertList.getTotalElements());
     }
 
 }

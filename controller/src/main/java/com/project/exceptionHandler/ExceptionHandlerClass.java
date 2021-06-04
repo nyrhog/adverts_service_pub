@@ -12,6 +12,7 @@ import javax.persistence.EntityNotFoundException;
 
 @ControllerAdvice
 @Slf4j
+//todo конфиги для логов
 public class ExceptionHandlerClass {
     @ResponseBody
     @ExceptionHandler(AuthenticationException.class)
@@ -36,4 +37,5 @@ public class ExceptionHandlerClass {
         log.error(ex.getMessage());
         return ex.getMessage();
     }
+
 }
