@@ -35,7 +35,7 @@ public class AdvertService implements IAdvertService {
     private final AdvertMapper mapper;
 
     @Value("${premiumDays}")
-    private Long premiumDays;
+    private Integer premiumDays;
 
     private static final String ADVERT_NOT_FOUND = "Advert with id: %s not found";
     private static final String PROFILE_NOT_FOUND = "Profile with id: %s not found";
@@ -73,24 +73,7 @@ public class AdvertService implements IAdvertService {
         Advert advert = advertsRepository.findById(advertDto.getAdvertId())
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
 
-        String adName = advertDto.getAdName();
-        Double adPrice = advertDto.getAdPrice();
-        String description = advertDto.getDescription();
-
         mapper.updateAdvert(advert, advertDto);
-
-//        if (adName != null) {
-//            advert.setAdName(adName);
-//        }
-//
-//        if (adPrice != null) {
-//            advert.setAdPrice(adPrice);
-//        }
-//
-//        if (description != null) {
-//            advert.setDescription(description);
-//        }
-
         advert.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
     }
 
@@ -110,15 +93,18 @@ public class AdvertService implements IAdvertService {
 
     @Transactional
     @Override
-    //todo кастомизировать выдачу премиума
-    public void enablePremiumStatus(Long advertId) {
+    public void enablePremiumStatus(Long advertId, Integer premDays) {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
+
+        if(premDays == null){
+            premDays = premiumDays;
+        }
 
         advert.getAdvertPremium()
                 .setIsActive(true)
                 .setPremStarted(LocalDateTime.now())
-                .setPremEnd(LocalDateTime.now().plusDays(premiumDays));
+                .setPremEnd(LocalDateTime.now().plusDays(premDays));
     }
 
     @Transactional
@@ -175,7 +161,7 @@ public class AdvertService implements IAdvertService {
                 .collect(Collectors.toList());
 
         Page<Advert> adverts = customizedAdvertRepository.findAllByCategoriesIn(categoriesNames,
-                                                                                PageRequest.of(pageNumber, pageSize));
+                PageRequest.of(pageNumber, pageSize));
 
         List<AdvertDto> advertDtoList = adverts.getContent()
                 .stream()
@@ -202,13 +188,13 @@ public class AdvertService implements IAdvertService {
 
     @Override
     @Transactional
-    public Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size){
+    public Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size) {
 
         Page<Advert> advertList = advertsRepository.getAllClosedAdvertsWithProfileId(profileId,
-                                                     PageRequest.of(page, size, Sort.by(Advert_.CLOSED).descending()));
+                PageRequest.of(page, size, Sort.by(Advert_.CLOSED).descending()));
 
-        List<AdvertDto> advertListDto = advertList.getContent().stream().
-                map(mapper::toAdvertDto)
+        List<AdvertDto> advertListDto = advertList.getContent().stream()
+                .map(mapper::toAdvertDto)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(advertListDto, PageRequest.of(page, size), advertList.getTotalElements());

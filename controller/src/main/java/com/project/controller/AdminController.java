@@ -45,10 +45,11 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/premuim/{id}")
-    public ResponseEntity<Void> enablePremiumAdvert(@PathVariable Long id) {
+    @PatchMapping("/premuim")
+    public ResponseEntity<Void> enablePremiumAdvert(@RequestParam Long id,
+                                                    @RequestParam(required = false) Integer days) {
 
-        advertService.enablePremiumStatus(id);
+        advertService.enablePremiumStatus(id, days);
 
         return ResponseEntity.noContent().build();
     }

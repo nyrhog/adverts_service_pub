@@ -9,7 +9,7 @@ public interface IAdvertService {
     void createAdvert(CreateAdvertDto advertDto);
     void updateAdvert(UpdateAdvertDto advertDto);
     void deleteAdvert(DeleteAdvertDto advertDto);
-    void enablePremiumStatus(Long advertId);
+    void enablePremiumStatus(Long advertId, Integer premDays);
     void addCommentaryToAdvert(CommentaryDto commentaryDto);
     void deleteComment(Long commentId);
     void editComment(EditCommentDto editCommentDto);

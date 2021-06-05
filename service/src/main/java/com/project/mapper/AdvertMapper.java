@@ -13,7 +13,6 @@ public interface AdvertMapper {
 
     AdvertDto toAdvertDto(Advert advert);
 
-    //todo
     @Mapping(target = "", source  = "", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "advert.adName", source = "dto.adName")
     @Mapping(target = "advert.adPrice", source = "dto.adPrice")
