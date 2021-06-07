@@ -4,6 +4,7 @@ import com.project.dao.ProfileRepository;
 import com.project.dto.AuthenticationRequestDto;
 import com.project.dto.RegistrationDto;
 import com.project.dto.ResponseDto;
+import com.project.dto.RestorePasswordDto;
 import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.jwt.JwtTokenProvider;
@@ -65,6 +66,25 @@ public class AuthController {
 
 
         userService.register(user);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/restore-password")
+    public ResponseEntity<Void> sendMessage(@RequestParam String username){
+
+        userService.sendMessageWithCode(username);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/restore-password")
+    public ResponseEntity<Void> restorePassword(@RequestBody RestorePasswordDto dto){
+
+        String username = dto.getUsername();
+        int code = dto.getCode();
+        String newPassword = dto.getNewPassword();
+
+        userService.restorePassword(username, code, newPassword);
+
         return ResponseEntity.noContent().build();
     }
 

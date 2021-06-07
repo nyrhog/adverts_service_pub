@@ -42,4 +42,7 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "role_id")}
     )
     private List<Role> roles;
+
+    @Column(name = "generated_code")
+    private Integer generatedValue;
 }

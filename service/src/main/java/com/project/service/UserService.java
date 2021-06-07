@@ -1,5 +1,7 @@
 package com.project.service;
 
+import com.project.CodeGenerator;
+import com.project.MailSender;
 import com.project.dao.RoleRepository;
 import com.project.dao.UserRepository;
 import com.project.entity.Role;
@@ -66,6 +68,41 @@ public class UserService implements IUserService {
         userRoles.add(adminRoleUser);
 
         return getUser(user, userRoles);
+    }
+
+    @Override
+    public void sendMessageWithCode(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow();
+        String email = user.getEmail();
+
+        int code = saveRestoreCode(user);
+        MailSender mailSender = new MailSender();
+
+        mailSender.send(email, code);
+    }
+
+    protected int saveRestoreCode(User user) {
+
+        int code = CodeGenerator.generate();
+        user.setGeneratedValue(code);
+
+        userRepository.saveAndFlush(user);
+        return code;
+    }
+
+    @Override
+    public void restorePassword(String username, int code, String newPassword) {
+        User user = userRepository.findByUsername(username).orElseThrow();
+        boolean codeIsEquals = user.getGeneratedValue().equals(code);
+
+        if (codeIsEquals) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            user.setGeneratedValue(null);
+            userRepository.saveAndFlush(user);
+            return;
+        }
+        //todo создать новый эксепшен
+        throw new RuntimeException();
     }
 
     private User getUser(User user, List<Role> userRoles) {

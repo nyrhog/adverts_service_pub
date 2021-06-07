@@ -21,4 +21,7 @@ public interface IUserService {
 
     User getUserById(Long id);
 
+    void sendMessageWithCode(String username);
+
+    void restorePassword(String username, int code, String newPassword);
 }

@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group 'com.project'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+}
+
+test {
+    useJUnitPlatform()
+}

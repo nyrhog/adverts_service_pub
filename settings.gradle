@@ -6,4 +6,5 @@ include 'service'
 include 'security'
 include 'controller'
 include 'configuration'
+include 'util'
 
