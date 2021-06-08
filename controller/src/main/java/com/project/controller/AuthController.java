@@ -1,6 +1,6 @@
 package com.project.controller;
 
-import com.project.dao.ProfileRepository;
+
 import com.project.dto.AuthenticationRequestDto;
 import com.project.dto.RegistrationDto;
 import com.project.dto.ResponseDto;
@@ -10,7 +10,6 @@ import com.project.entity.User;
 import com.project.jwt.JwtTokenProvider;
 import com.project.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 
@@ -19,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 @RestController
 @RequestMapping(value = "/auth")
@@ -33,6 +33,7 @@ public class AuthController {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<ResponseDto> login(@RequestBody AuthenticationRequestDto requestDto) {
@@ -66,10 +67,10 @@ public class AuthController {
 
 
         userService.register(user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.created(URI.create(String.format("/users/%s", user.getUsername()))).build();
     }
 
-    @PostMapping("/restore-password")
+    @PutMapping("/restore-password")
     public ResponseEntity<Void> sendMessage(@RequestParam String username){
 
         userService.sendMessageWithCode(username);

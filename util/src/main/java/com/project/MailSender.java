@@ -17,7 +17,7 @@ public class MailSender {
     @SneakyThrows
     public MailSender() {
 
-        try (FileReader reader = new FileReader("util/src/main/resources/mail.properties")) {
+        try (FileReader reader = new FileReader("D:\\Projects\\adverts_services\\util\\src\\main\\resources\\mail.properties")) {
             Properties properties = new Properties();
             properties.load(reader);
 

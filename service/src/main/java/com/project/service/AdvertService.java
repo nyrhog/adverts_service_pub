@@ -39,6 +39,7 @@ public class AdvertService implements IAdvertService {
 
     private static final String ADVERT_NOT_FOUND = "Advert with id: %s not found";
     private static final String PROFILE_NOT_FOUND = "Profile with id: %s not found";
+    private static final String COMMENTARY_NOT_FOUND = "Commentary with id: %s not found";
 
     @Transactional
     @Override
@@ -65,6 +66,8 @@ public class AdvertService implements IAdvertService {
         advertsRepository.saveAndFlush(advert);
 
         profile.getAdverts().add(advert);
+
+        log.info("Advert was created");
     }
 
     @Transactional
@@ -75,6 +78,8 @@ public class AdvertService implements IAdvertService {
 
         mapper.updateAdvert(advert, advertDto);
         advert.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
+
+        log.info("Advert was updated");
     }
 
     @Transactional
@@ -89,6 +94,7 @@ public class AdvertService implements IAdvertService {
 
         advertsRepository.delete(advert);
 
+        log.info("Advert was deleted");
     }
 
     @Transactional
@@ -105,6 +111,8 @@ public class AdvertService implements IAdvertService {
                 .setIsActive(true)
                 .setPremStarted(LocalDateTime.now())
                 .setPremEnd(LocalDateTime.now().plusDays(premDays));
+
+        log.info("Premium status was enabled to advert with id: " + advertId);
     }
 
     @Transactional
@@ -123,25 +131,31 @@ public class AdvertService implements IAdvertService {
 
         sender.getComments().add(comment);
         advert.getComments().add(comment);
+
+        log.info("Commentary was added");
     }
 
     //todo посмотреть что там по id
     @Transactional
     public void deleteComment(Long commentId) {
-        //todo exception message
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new EntityNotFoundException());
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, commentId)));
 
         comment.getAdvert().getComments().remove(comment);
         comment.getProfile().getComments().remove(comment);
 
         commentRepository.delete(comment);
+
+        log.info("Commentary was deleted");
     }
 
     @Transactional
     public void editComment(EditCommentDto editCommentDto) {
         Comment comment = commentRepository.findById(editCommentDto.getCommentId())
-                .orElseThrow(() -> new EntityNotFoundException());
+                .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, editCommentDto.getCommentId())));
         comment.setCommentText(editCommentDto.getNewCommentText());
+
+        log.info("Commentary was edited");
     }
 
     @Transactional
@@ -168,10 +182,12 @@ public class AdvertService implements IAdvertService {
                 .map((mapper::toAdvertDto))
                 .collect(Collectors.toList());
 
+        log.info("Adverts was taken");
         return new PageImpl<>(advertDtoList, PageRequest.of(pageNumber, pageSize), adverts.getTotalElements());
     }
 
     protected List<String> replaceCharsInCategories(List<String> categories) {
+        log.info("Chars in category names was changed");
         return categories.stream()
                 .map(category -> category.replace("_", " "))
                 .collect(Collectors.toList());
@@ -184,6 +200,8 @@ public class AdvertService implements IAdvertService {
             advertPremium.setIsActive(false);
             advertPremium.setPremStarted(null);
         }));
+
+        log.info("Expired premiums was deactivated");
     }
 
     @Override
@@ -197,6 +215,7 @@ public class AdvertService implements IAdvertService {
                 .map(mapper::toAdvertDto)
                 .collect(Collectors.toList());
 
+        log.info("Selling history was taking");
         return new PageImpl<>(advertListDto, PageRequest.of(page, size), advertList.getTotalElements());
     }
 

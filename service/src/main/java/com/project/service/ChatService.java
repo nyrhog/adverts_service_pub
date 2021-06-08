@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -41,6 +42,7 @@ public class ChatService implements IChatService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, createChatDto.getChatCreateProfileId())));
 
         if (isChatExist(chatCreator, recipient)) {
+            log.info("Chat is exist");
             return;
         }
 
@@ -57,7 +59,7 @@ public class ChatService implements IChatService {
 
         Profile messageSender = profileRepository.findById(messageDto.getSenderIdProfile())
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, messageDto.getSenderIdProfile())));
-        Chat chat = chatRepository.findById(messageDto.getChatId()).orElseThrow(() -> new EntityNotFoundException());
+        Chat chat = chatRepository.findById(messageDto.getChatId()).orElseThrow(EntityNotFoundException::new);
 
         Message message = new Message();
         message.setText(messageDto.getText());
@@ -68,14 +70,10 @@ public class ChatService implements IChatService {
         message.setProfile(messageSender);
     }
 
-    //todo сделать запрос к бд вместо этой фигни
+
     protected boolean isChatExist(Profile creator, Profile recipient) {
-        for (Chat chat : creator.getChats()) {
-            if (chat.getProfiles().contains(recipient)) {
-                return true;
-            }
-        }
-        return false;
+        Chat chat = chatRepository.getChatByProfilesIdIn(creator.getId(), recipient.getId());
+        return chat != null;
     }
 
     @Transactional
@@ -83,7 +81,7 @@ public class ChatService implements IChatService {
     public void updateMessage(UpdateMessageDto updateMessageDto) {
 
         Message message = messageRepository.findById(updateMessageDto.getMessageId())
-                .orElseThrow(() -> new EntityNotFoundException());
+                .orElseThrow(EntityNotFoundException::new);
 
         String messageCreator = message.getProfile().getUser().getUsername();
 
@@ -102,7 +100,7 @@ public class ChatService implements IChatService {
     @Override
     public void deleteMessage(DeleteMessageDto deleteMessageDto) {
         Message message = messageRepository.findById(deleteMessageDto.getMessageId())
-                .orElseThrow(() -> new EntityNotFoundException());
+                .orElseThrow(EntityNotFoundException::new);
 
         String messageCreator = message.getProfile().getUser().getUsername();
 

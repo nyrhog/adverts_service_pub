@@ -13,6 +13,11 @@ dependencies {
     implementation(project(":api"))
     implementation(project(":security"))
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.4.5'
+
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.0'
 }
 
 test {

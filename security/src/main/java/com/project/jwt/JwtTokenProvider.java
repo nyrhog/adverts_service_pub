@@ -28,7 +28,6 @@ public class JwtTokenProvider {
     @Value("${jwt.token.expired}")
     private long validityInMilliseconds;
 
-
     private final UserDetailsService userDetailsService;
 
     @Autowired
