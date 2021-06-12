@@ -76,7 +76,22 @@ public class AdvertService implements IAdvertService {
         Advert advert = advertsRepository.findById(advertDto.getAdvertId())
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
 
-        mapper.updateAdvert(advert, advertDto);
+        String adName = advertDto.getAdName();
+        Double adPrice = advert.getAdPrice();
+        String description = advert.getDescription();
+
+        if(adName != null){
+            advert.setAdName(adName);
+        }
+
+        if(adPrice != null){
+            advert.setAdPrice(adPrice);
+        }
+
+        if(description != null){
+            advert.setDescription(description);
+        }
+//        mapper.updateAdvert(advert, advertDto);
         advert.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
 
         log.info("Advert was updated");
@@ -87,10 +102,6 @@ public class AdvertService implements IAdvertService {
     public void deleteAdvert(DeleteAdvertDto advertDto) {
         Advert advert = advertsRepository.findById(advertDto.getAdvertId())
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
-
-        DeleteAdvertDto returnAdvertDto = new DeleteAdvertDto();
-        returnAdvertDto.setUsername(advert.getProfile().getUser().getUsername());
-        returnAdvertDto.setAdvertId(advertDto.getAdvertId());
 
         advertsRepository.delete(advert);
 
@@ -187,7 +198,6 @@ public class AdvertService implements IAdvertService {
     }
 
     protected List<String> replaceCharsInCategories(List<String> categories) {
-        log.info("Chars in category names was changed");
         return categories.stream()
                 .map(category -> category.replace("_", " "))
                 .collect(Collectors.toList());
@@ -218,5 +228,18 @@ public class AdvertService implements IAdvertService {
         log.info("Selling history was taking");
         return new PageImpl<>(advertListDto, PageRequest.of(page, size), advertList.getTotalElements());
     }
+
+    @Override
+    @Transactional
+    public AdvertDto getOneAdvert(Long advertId){
+        Advert advert = advertsRepository.findById(advertId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
+
+        AdvertDto advertDto = mapper.toAdvertDto(advert);
+
+        log.info("Advert was got with id: " + advertId);
+        return advertDto;
+    }
+
 
 }

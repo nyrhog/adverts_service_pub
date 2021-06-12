@@ -6,12 +6,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class DeleteAdvertDto {
+public class GetChatDto {
 
-    @NotBlank
-    private String username;
-
-    @NotNull
-    private Long advertId;
-
+   @NotBlank
+   private String username;
+   @NotNull
+   private Long chatId;
 }

@@ -15,5 +15,6 @@ public interface IAdvertService {
     void editComment(EditCommentDto editCommentDto);
     Page<AdvertDto> getAdverts(AdvertListDto advertDto);
     Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size);
+    AdvertDto getOneAdvert(Long advertId);
 
 }

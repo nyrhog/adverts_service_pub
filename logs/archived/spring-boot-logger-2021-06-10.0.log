@@ -1,0 +1,28 @@
+2021-06-10 13:19:53,625 INFO org.hibernate.validator.internal.util.Version [background-preinit] HV000001: Hibernate Validator 6.1.7.Final
+2021-06-10 13:19:53,659 INFO org.springframework.boot.StartupInfoLogger [main] Starting AdvertsServiceApplication using Java 15 on DESKTOP-GK0HJTR with PID 1880 (D:\Projects\adverts_services\controller\build\classes\java\main started by ejik_ in D:\Projects\adverts_services)
+2021-06-10 13:19:53,660 DEBUG org.springframework.boot.StartupInfoLogger [main] Running with Spring Boot v2.4.5, Spring v5.3.6
+2021-06-10 13:19:53,663 INFO org.springframework.boot.SpringApplication [main] No active profile set, falling back to default profiles: default
+2021-06-10 13:19:54,689 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2021-06-10 13:19:54,749 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 55 ms. Found 10 JPA repository interfaces.
+2021-06-10 13:19:55,007 INFO org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [main] Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@2af69643' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2021-06-10 13:19:55,012 INFO org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [main] Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2021-06-10 13:19:55,207 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat initialized with port(s): 8080 (http)
+2021-06-10 13:19:55,218 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-8080"]
+2021-06-10 13:19:55,218 INFO org.apache.juli.logging.DirectJDKLog [main] Starting service [Tomcat]
+2021-06-10 13:19:55,219 INFO org.apache.juli.logging.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.45]
+2021-06-10 13:19:55,305 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing Spring embedded WebApplicationContext
+2021-06-10 13:19:55,305 INFO org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext [main] Root WebApplicationContext: initialization completed in 1516 ms
+2021-06-10 13:19:55,439 INFO org.hibernate.jpa.internal.util.LogHelper [main] HHH000204: Processing PersistenceUnitInfo [name: default]
+2021-06-10 13:19:55,471 INFO org.hibernate.Version [main] HHH000412: Hibernate ORM core version 5.4.30.Final
+2021-06-10 13:19:55,594 INFO org.hibernate.annotations.common.reflection.java.JavaReflectionManager [main] HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2021-06-10 13:19:55,663 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Starting...
+2021-06-10 13:19:56,216 INFO com.zaxxer.hikari.HikariDataSource [main] HikariPool-1 - Start completed.
+2021-06-10 13:19:56,225 INFO org.hibernate.dialect.Dialect [main] HHH000400: Using dialect: org.hibernate.dialect.MySQL57Dialect
+2021-06-10 13:19:57,020 INFO org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator [main] HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2021-06-10 13:19:57,027 INFO org.springframework.orm.jpa.AbstractEntityManagerFactoryBean [main] Initialized JPA EntityManagerFactory for persistence unit 'default'
+2021-06-10 13:19:57,094 WARN org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration [main] spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2021-06-10 13:19:57,803 INFO org.springframework.scheduling.concurrent.ExecutorConfigurationSupport [main] Initializing ExecutorService 'applicationTaskExecutor'
+2021-06-10 13:19:58,043 INFO org.springframework.security.web.DefaultSecurityFilterChain [main] Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7d0e43d6, org.springframework.security.web.context.SecurityContextPersistenceFilter@a70daf4, org.springframework.security.web.header.HeaderWriterFilter@1690929, org.springframework.security.web.authentication.logout.LogoutFilter@222a7429, com.project.jwt.JwtTokenFilter@df04d12, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7611e295, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7c31e01f, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@757f47f0, org.springframework.security.web.session.SessionManagementFilter@37b44e8e, org.springframework.security.web.access.ExceptionTranslationFilter@4b5ceb5d, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@75f446df]
+2021-06-10 13:19:58,072 INFO org.apache.juli.logging.DirectJDKLog [main] Starting ProtocolHandler ["http-nio-8080"]
+2021-06-10 13:19:58,087 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat started on port(s): 8080 (http) with context path ''
+2021-06-10 13:19:58,116 INFO org.springframework.boot.StartupInfoLogger [main] Started AdvertsServiceApplication in 5.543 seconds (JVM running for 6.318)

@@ -16,6 +16,7 @@ public class AdvertDto {
     private LocalDateTime updated;
     private LocalDateTime closed;
     private List<CategoryDto> categories;
+    private List<CommentDto> comments;
 
 
 }

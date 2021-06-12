@@ -1,5 +1,6 @@
 package com.project.controller;
 
+import com.project.dto.ProfileDto;
 import com.project.dto.ProfileUpdateDto;
 import com.project.dto.RateDto;
 import com.project.service.IProfileService;
@@ -15,23 +16,30 @@ import javax.validation.Valid;
 @RequestMapping("/profiles")
 public class ProfileController {
 
-   private final IProfileService profileService;
+    private final IProfileService profileService;
 
-   @PatchMapping
-   @PreAuthorize("#updateDto.username == authentication.principal.username or hasRole('ROLE_ADMIN')")
-   public ResponseEntity<Void> updateProfile(ProfileUpdateDto updateDto){
+    @PatchMapping
+    @PreAuthorize("#updateDto.username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> updateProfile(@Valid @RequestBody ProfileUpdateDto updateDto) {
 
-       profileService.updateProfile(updateDto);
+        profileService.updateProfile(updateDto);
 
-       return ResponseEntity.noContent().build();
-   }
+        return ResponseEntity.ok().build();
+    }
 
-   @PutMapping("/rate")
-   @PreAuthorize("#rateDto.username == authentication.principal.username")
-    public ResponseEntity<Void> rateProfile(@Valid @RequestBody RateDto rateDto){
-       profileService.rateProfile(rateDto);
+    @PutMapping("/rate")
+    @PreAuthorize("#rateDto.username == authentication.principal.username")
+    public ResponseEntity<Void> rateProfile(@Valid @RequestBody RateDto rateDto) {
 
-       return ResponseEntity.noContent().build();
-   }
+        profileService.rateProfile(rateDto);
+        return ResponseEntity.ok().build();
+    }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProfileDto> getProfile(@PathVariable Long id){
+
+        ProfileDto profile = profileService.getProfile(id);
+        return ResponseEntity.ok(profile);
+
+    }
 }

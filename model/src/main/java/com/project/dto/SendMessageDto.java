@@ -13,7 +13,7 @@ public class SendMessageDto {
     @NotNull
     private Long senderIdProfile;
     @NotNull
-    private Long chatId;
+    private Long recipientIdProfile;
     @NotBlank
     private String text;
 }

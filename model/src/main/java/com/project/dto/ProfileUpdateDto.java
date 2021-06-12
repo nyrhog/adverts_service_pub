@@ -12,11 +12,8 @@ public class ProfileUpdateDto {
     private String username;
     @NotNull
     private Long id;
-    @NotBlank
     private String name;
-    @NotBlank
     private String surname;
-    @NotBlank
     private String phoneNumber;
 
 }

@@ -12,12 +12,12 @@ import javax.persistence.EntityNotFoundException;
 
 @ControllerAdvice
 @Slf4j
-//todo конфиги для логов
+
 public class ExceptionHandlerClass {
     @ResponseBody
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    String internalServerErrorException(AuthenticationException ex){
+    String internalServerErrorException(AuthenticationException ex) {
         log.error(ex.getMessage());
         return ex.getMessage();
     }
@@ -25,7 +25,7 @@ public class ExceptionHandlerClass {
     @ResponseBody
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String entityNotFoundException(EntityNotFoundException ex){
+    String entityNotFoundException(EntityNotFoundException ex) {
         log.error(ex.getMessage());
         return ex.getMessage();
     }
@@ -33,7 +33,7 @@ public class ExceptionHandlerClass {
     @ResponseBody
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    String globalExceptionHandler(Exception ex){
+    String globalExceptionHandler(Exception ex) {
         log.error(ex.getMessage());
         return ex.getMessage();
     }

@@ -3,9 +3,12 @@ package com.project.dao;
 import com.project.entity.Advert;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface AdvertRepository extends JpaRepository<Advert, Long> {
@@ -15,4 +18,7 @@ public interface AdvertRepository extends JpaRepository<Advert, Long> {
             "WHERE a.status = 'CLOSED' and p.id = ?1")
     Page<Advert> getAllClosedAdvertsWithProfileId(Long profileId, Pageable page);
 
+    @EntityGraph
+    @Override
+    Optional<Advert> findById(Long aLong);
 }

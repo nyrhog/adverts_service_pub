@@ -12,6 +12,8 @@ import javax.persistence.*;
 public class Rating {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rating_seq")
+    @SequenceGenerator(name = "rating_seq", sequenceName = "SEQ_RATING", allocationSize = 1)
     private Long id;
 
     @Column(name = "rating")

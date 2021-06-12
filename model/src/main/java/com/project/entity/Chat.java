@@ -26,7 +26,7 @@ public class Chat {
     )
     private List<Message> messages = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "chats")
+    @ManyToMany(mappedBy = "chats", fetch = FetchType.LAZY)
     private List<Profile> profiles = new ArrayList<>();
 
     @org.hibernate.annotations.CreationTimestamp
