@@ -19,7 +19,7 @@ public class ProfileController {
     private final IProfileService profileService;
 
     @PatchMapping
-    @PreAuthorize("#updateDto.username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateProfile(@Valid @RequestBody ProfileUpdateDto updateDto) {
 
         profileService.updateProfile(updateDto);
@@ -28,7 +28,6 @@ public class ProfileController {
     }
 
     @PutMapping("/rate")
-    @PreAuthorize("#rateDto.username == authentication.principal.username")
     public ResponseEntity<Void> rateProfile(@Valid @RequestBody RateDto rateDto) {
 
         profileService.rateProfile(rateDto);

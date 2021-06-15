@@ -5,7 +5,7 @@ import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.service.IAdvertService;
 import com.project.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,16 +13,11 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
 
     private final IUserService userService;
     private final IAdvertService advertService;
-
-    @Autowired
-    public AdminController(IUserService userService, IAdvertService advertService) {
-        this.userService = userService;
-        this.advertService = advertService;
-    }
 
     @PostMapping("/registration")
     public ResponseEntity<Void> registerAdmin(@Valid @RequestBody RegistrationDto registrationDto){

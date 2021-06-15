@@ -17,7 +17,7 @@ public class Category {
     @SequenceGenerator(name = "category_seq", sequenceName = "SEQ_CATEGORY", allocationSize = 1)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String categoryName;
 
     @OneToMany(mappedBy = "mainCategory")

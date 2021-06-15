@@ -2,12 +2,16 @@ plugins {
     id 'java'
 }
 
+def mapstructVersion = '1.4.2.Final'
+
 group 'com.project'
 version '0.0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
+
+
 
 compileJava {
     options.compilerArgs += [
@@ -17,11 +21,11 @@ compileJava {
 }
 
 dependencies {
-    compile(project(":api"))
-    compile(project(":util"))
+    implementation(project(":api"))
+    implementation(project(":util"))
     // https://mvnrepository.com/artifact/org.mapstruct/mapstruct
-    implementation group: 'org.mapstruct', name: 'mapstruct', version: '1.4.2.Final'
-    annotationProcessor group: 'org.mapstruct',name: 'mapstruct-processor',version: '1.2.0.Final'
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: "${mapstructVersion}"
+    annotationProcessor group: 'org.mapstruct',name: 'mapstruct-processor',version: "${mapstructVersion}"
 
 }
 

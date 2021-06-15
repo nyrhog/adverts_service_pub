@@ -1,4 +1,4 @@
-package com.project.exceprion;
+package com.project.exception;
 
 public class InvalidUserException extends RuntimeException{
 

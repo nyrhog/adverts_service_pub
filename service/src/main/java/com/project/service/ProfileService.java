@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
-
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -30,24 +29,13 @@ public class ProfileService implements IProfileService {
     @Override
     public void updateProfile(ProfileUpdateDto updateDto) {
 
-        Profile profile = profileRepository.findById(updateDto.getId())
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException("Profile with id: " + updateDto.getId() + " not found"));
 
-        String name = updateDto.getName();
-        String phoneNumber = updateDto.getPhoneNumber();
-        String surname = updateDto.getSurname();
-
-        if (name != null) {
-            profile.setName(name);
-        }
-
-        if (phoneNumber != null) {
-            profile.setPhoneNumber(phoneNumber);
-        }
-
-        if (surname != null) {
-            profile.setSurname(surname);
-        }
+        mapper.updateProfile(profile, updateDto);
+        profile.setUpdated(LocalDateTime.now());
     }
 
     @Transactional
@@ -74,7 +62,4 @@ public class ProfileService implements IProfileService {
 
         return dto;
     }
-
-
-
 }

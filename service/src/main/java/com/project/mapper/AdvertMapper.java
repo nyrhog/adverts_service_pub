@@ -17,5 +17,4 @@ public interface AdvertMapper {
     @Mapping(target = "advert.adPrice", source = "dto.adPrice", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "advert.description", source = "dto.description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateAdvert(@MappingTarget Advert advert, UpdateAdvertDto dto);
-
 }

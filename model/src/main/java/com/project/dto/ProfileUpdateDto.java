@@ -8,8 +8,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProfileUpdateDto {
 
-    @NotBlank
-    private String username;
     @NotNull
     private Long id;
     private String name;

@@ -7,7 +7,7 @@ import com.project.dto.*;
 import com.project.entity.Chat;
 import com.project.entity.Message;
 import com.project.entity.Profile;
-import com.project.exceprion.InvalidUserException;
+import com.project.exception.InvalidUserException;
 import com.project.mapper.ChatMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,9 @@ public class ChatService implements IChatService {
     @Override
     public void createChat(CreateChatDto createChatDto) {
 
-        Profile chatCreator = profileRepository.findById(createChatDto.getChatCreateProfileId())
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Profile chatCreator = profileRepository.getProfileByUserUsername(currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, createChatDto.getChatCreateProfileId())));
 
         Profile recipient = profileRepository.findById(createChatDto.getChatWithProfileId())
@@ -56,11 +58,12 @@ public class ChatService implements IChatService {
     @Transactional
     @Override
     public void sendMessage(SendMessageDto messageDto) {
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
-        Profile messageSender = profileRepository.findById(messageDto.getSenderIdProfile())
+        Profile messageSender = profileRepository.getProfileByUserUsername(currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, messageDto.getSenderIdProfile())));
 
-        Chat chat = chatRepository.getChatByProfilesIdIn(messageDto.getSenderIdProfile(), messageDto.getRecipientIdProfile());
+        Chat chat = chatRepository.getChatByProfilesIdIn(messageSender.getId(), messageDto.getRecipientIdProfile());
 
         Message message = new Message();
         message.setText(messageDto.getText());
@@ -82,17 +85,18 @@ public class ChatService implements IChatService {
     @Transactional
     @Override
     public void updateMessage(UpdateMessageDto updateMessageDto) {
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Message message = messageRepository.findById(updateMessageDto.getMessageId())
                 .orElseThrow(EntityNotFoundException::new);
 
         String messageCreator = message.getProfile().getUser().getUsername();
 
-        if(!updateMessageDto.getUsername().equals(messageCreator)){
-            throw new InvalidUserException(String.format("Promoted user with username: %s is not a message creator", updateMessageDto.getUsername()));
+        if (!currentPrincipalName.equals(messageCreator)) {
+            throw new InvalidUserException("Promoted user with username: %s is not a message creator");
         }
 
-        if (message.getText().equals(updateMessageDto.getNewText())){
+        if (message.getText().equals(updateMessageDto.getNewText())) {
             return;
         }
 
@@ -103,14 +107,17 @@ public class ChatService implements IChatService {
 
     @Transactional
     @Override
-    public void deleteMessage(DeleteMessageDto deleteMessageDto) {
-        Message message = messageRepository.findById(deleteMessageDto.getMessageId())
+    public void deleteMessage(Long id) {
+
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Message message = messageRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
 
         String messageCreator = messageRepository.getMessageSenderUsername(message.getId());
 
-        if(!deleteMessageDto.getUsername().equals(messageCreator)){
-            throw new InvalidUserException(String.format("Promoted user with username: %s is not a message creator", deleteMessageDto.getUsername()));
+        if (!currentPrincipalName.equals(messageCreator)) {
+            throw new InvalidUserException(String.format("Promoted user with username: %s is not a message creator", currentPrincipalName));
         }
 
         messageRepository.delete(message);
@@ -119,11 +126,25 @@ public class ChatService implements IChatService {
 
     @Transactional
     @Override
-    public ChatDto getChat(GetChatDto dto){
-        Chat chat = chatRepository.findById(dto.getChatId()).orElseThrow(EntityNotFoundException::new);
-        ChatDto chatDto = mapper.toChatDto(chat);
+    public ChatDto getChat(Long id) {
 
-        log.info("Chat was got");
-        return chatDto;
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException());
+
+        Chat chat = chatRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        boolean contains = profile.getChats().contains(chat);
+
+        if (contains){
+            ChatDto chatDto = mapper.toChatDto(chat);
+
+            log.info("Chat was got");
+            return chatDto;
+        }
+
+        throw new EntityNotFoundException();
     }
+
 }

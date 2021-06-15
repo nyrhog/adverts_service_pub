@@ -2,11 +2,16 @@ package com.project.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Data
 public class UpdateMessageDto {
 
-    private String username;
+    @NotNull
     private Long messageId;
+
+    @NotBlank
     private String newText;
 
 }

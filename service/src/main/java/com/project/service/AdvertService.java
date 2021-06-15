@@ -44,8 +44,9 @@ public class AdvertService implements IAdvertService {
     @Transactional
     @Override
     public void createAdvert(CreateAdvertDto advertDto) {
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
-        Profile profile = profileRepository.findById(advertDto.getProfileId())
+        Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, advertDto.getProfileId())));
 
         List<Category> categories = categoryRepository.findByCategoryNameIn(advertDto.getCategories());
@@ -73,25 +74,13 @@ public class AdvertService implements IAdvertService {
     @Transactional
     @Override
     public void updateAdvert(UpdateAdvertDto advertDto) {
-        Advert advert = advertsRepository.findById(advertDto.getAdvertId())
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(advertDto.getAdvertId(), currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
 
-        String adName = advertDto.getAdName();
-        Double adPrice = advert.getAdPrice();
-        String description = advert.getDescription();
+        mapper.updateAdvert(advert, advertDto);
 
-        if(adName != null){
-            advert.setAdName(adName);
-        }
-
-        if(adPrice != null){
-            advert.setAdPrice(adPrice);
-        }
-
-        if(description != null){
-            advert.setDescription(description);
-        }
-//        mapper.updateAdvert(advert, advertDto);
         advert.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
 
         log.info("Advert was updated");
@@ -100,7 +89,10 @@ public class AdvertService implements IAdvertService {
     @Transactional
     @Override
     public void deleteAdvert(DeleteAdvertDto advertDto) {
-        Advert advert = advertsRepository.findById(advertDto.getAdvertId())
+
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(advertDto.getAdvertId(), currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
 
         advertsRepository.delete(advert);
@@ -129,11 +121,16 @@ public class AdvertService implements IAdvertService {
     @Transactional
     @Override
     public void addCommentaryToAdvert(CommentaryDto commentaryDto) {
-        Advert advert = advertsRepository.findById(commentaryDto.getAdvertId())
+
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Advert advert = advertsRepository
+                .getAdvertByIdAndProfile_User_Username(commentaryDto.getAdvertId(), currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, commentaryDto.getAdvertId())));
 
-        Profile sender = profileRepository.findById(commentaryDto.getSenderId())
-                .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, commentaryDto.getSenderId())));
+        Profile sender = profileRepository
+                .getProfileByUserUsername(currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
 
         Comment comment = new Comment();
         comment.setCommentText(commentaryDto.getCommentaryMessage());
@@ -146,14 +143,14 @@ public class AdvertService implements IAdvertService {
         log.info("Commentary was added");
     }
 
-    //todo посмотреть что там по id
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, commentId)));
 
-        comment.getAdvert().getComments().remove(comment);
-        comment.getProfile().getComments().remove(comment);
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Comment comment = commentRepository
+                .getCommentByIdAndProfile_User_Username(commentId, currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, commentId)));
 
         commentRepository.delete(comment);
 
@@ -162,8 +159,13 @@ public class AdvertService implements IAdvertService {
 
     @Transactional
     public void editComment(EditCommentDto editCommentDto) {
-        Comment comment = commentRepository.findById(editCommentDto.getCommentId())
+
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Comment comment = commentRepository
+                .getCommentByIdAndProfile_User_Username(editCommentDto.getCommentId(), currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, editCommentDto.getCommentId())));
+
         comment.setCommentText(editCommentDto.getNewCommentText());
 
         log.info("Commentary was edited");
@@ -172,7 +174,6 @@ public class AdvertService implements IAdvertService {
     @Transactional
     public Page<AdvertDto> getAdverts(AdvertListDto advertDto) {
 
-        //todo как оно отрабатывает
         disableExpiredPrems();
 
         Integer pageNumber = advertDto.getPageNumber();
@@ -240,6 +241,4 @@ public class AdvertService implements IAdvertService {
         log.info("Advert was got with id: " + advertId);
         return advertDto;
     }
-
-
 }

@@ -9,6 +9,7 @@ import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.jwt.JwtTokenProvider;
 import com.project.service.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,18 +23,12 @@ import java.net.URI;
 
 @RestController
 @RequestMapping(value = "/auth")
+@RequiredArgsConstructor
 public class AuthController {
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final IUserService userService;
-
-    @Autowired
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, IUserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
-    }
-
 
     @PostMapping("/login")
     public ResponseEntity<ResponseDto> login(@RequestBody AuthenticationRequestDto requestDto) {

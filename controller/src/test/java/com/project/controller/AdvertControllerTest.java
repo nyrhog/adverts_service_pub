@@ -1,20 +1,17 @@
 package com.project.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.AdvertsServiceApplication;
 import com.project.dao.*;
 import com.project.dto.*;
 import com.project.entity.*;
 import com.project.service.IUserService;
-import com.project.service.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -22,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -103,7 +99,6 @@ class AdvertControllerTest {
     void createAdvert() throws Exception {
 
         CreateAdvertDto advertDto = new CreateAdvertDto();
-        advertDto.setUsername("nyrhog");
         advertDto.setAdName("adName");
         advertDto.setCategories(List.of("asd"));
         advertDto.setDescription("asdasdasd");
@@ -129,14 +124,9 @@ class AdvertControllerTest {
         userService.register(user);
         categoryRepository.save(category);
 
-        Advert advert = new Advert();
-        advert.setAdName("ad");
-        advert.setAdPrice(123d);
-        advert.setStatus(Status.ACTIVE);
+        saveAdvert();
 
-        advertRepository.save(advert);
-
-        advert = advertRepository.findAll().get(0);
+        Advert advert = advertRepository.findAll().get(0);
 
         UpdateAdvertDto advertDto = new UpdateAdvertDto();
         advertDto.setAdvertId(advert.getId());
@@ -159,10 +149,10 @@ class AdvertControllerTest {
     @WithMockUser(username = "nyrhog")
     void deleteAdvert() throws Exception {
 
-        Long id = saveAdvert().getId();
+        Advert advert = saveAdvert();
 
         DeleteAdvertDto advertDto = new DeleteAdvertDto();
-        advertDto.setAdvertId(id);
+        advertDto.setAdvertId(advert.getId());
         advertDto.setUsername("nyrhog");
 
         assertEquals(1, advertRepository.findAll().size());
@@ -185,8 +175,6 @@ class AdvertControllerTest {
 
         CommentaryDto commentaryDto = new CommentaryDto();
         commentaryDto.setAdvertId(id);
-        commentaryDto.setUsername("nyrhog");
-        commentaryDto.setSenderId(1L);
         commentaryDto.setCommentaryMessage("Some comment");
 
         mockMvc.perform(post("/adverts/comment")
@@ -206,10 +194,11 @@ class AdvertControllerTest {
     @Transactional
     @WithMockUser(username = "nyrhog")
     void updateComment() throws Exception {
+        Profile profile = profileRepository.findAll().get(0);
 
         Comment comment = new Comment();
         comment.setCommentText("text");
-
+        comment.setProfile(profile);
         comment = commentRepository.save(comment);
 
         EditCommentDto dto = new EditCommentDto();
@@ -272,10 +261,13 @@ class AdvertControllerTest {
     }
 
     private Advert saveAdvert() {
+        Profile profile = profileRepository.findAll().get(0);
+
         Advert advert = new Advert();
         advert.setAdName("ad");
         advert.setAdPrice(123d);
         advert.setStatus(Status.ACTIVE);
+        advert.setProfile(profile);
 
         return advertRepository.save(advert);
     }

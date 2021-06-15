@@ -9,6 +9,7 @@ import java.util.List;
 public class AdvertDto {
 
     private Long id;
+    private ProfileDto profile;
     private String adName;
     private Double adPrice;
     private Status status;

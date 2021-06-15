@@ -12,12 +12,17 @@ repositories {
 dependencies {
     implementation(project(":api"))
     implementation(project(":security"))
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.4.5'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVers}"
+
+//    compile group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.1.6'
+//    compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.2'
+
+//    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
     // https://mvnrepository.com/artifact/com.h2database/h2
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.0'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBootVers}"
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
     testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.5.0'
 

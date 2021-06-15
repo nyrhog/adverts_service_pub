@@ -11,11 +11,6 @@ repositories {
 
 dependencies {
     compile(project(":model"))
-    compile(project(":repository"))
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.4.5'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.4.5'
-}
-
-test {
-    useJUnitPlatform()
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springBootVers}"
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVers}"
 }

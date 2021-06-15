@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class CommentDto {
     private Long id;
-    private String profileName;
+    private ProfileDto profile;
     private String commentText;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;

@@ -8,8 +8,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class RateDto {
 
-    @NotBlank
-    private String username;
     @NotNull
     private Long profileId;
     @NotNull

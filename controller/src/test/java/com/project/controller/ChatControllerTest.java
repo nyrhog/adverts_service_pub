@@ -53,16 +53,14 @@ class ChatControllerTest {
     private MockMvc mockMvc;
 
     private final ChatRepository chatRepository;
-    private final ProfileRepository profileRepository;
     private final IUserService userService;
     private final IChatService chatService;
     private final MessageRepository messageRepository;
 
 
     @Autowired
-    public ChatControllerTest(ChatRepository chatRepository, ProfileRepository profileRepository, IUserService userService, IChatService chatService, MessageRepository messageRepository) {
+    public ChatControllerTest(ChatRepository chatRepository, IUserService userService, IChatService chatService, MessageRepository messageRepository) {
         this.chatRepository = chatRepository;
-        this.profileRepository = profileRepository;
         this.userService = userService;
         this.chatService = chatService;
         this.messageRepository = messageRepository;
@@ -101,7 +99,6 @@ class ChatControllerTest {
     void createChat() throws Exception {
 
         CreateChatDto createChatDto = new CreateChatDto();
-        createChatDto.setUsername("nyrhog");
         createChatDto.setChatCreateProfileId(1L);
         createChatDto.setChatWithProfileId(2L);
 
@@ -120,7 +117,6 @@ class ChatControllerTest {
     void sendMessage() throws Exception {
 
         SendMessageDto sendMessageDto = new SendMessageDto();
-        sendMessageDto.setUsername("nyrhog");
         sendMessageDto.setRecipientIdProfile(2L);
         sendMessageDto.setSenderIdProfile(1L);
         sendMessageDto.setText("Message");
@@ -147,7 +143,6 @@ class ChatControllerTest {
 
         GetChatDto dto = new GetChatDto();
         dto.setChatId(testChatId);
-        dto.setUsername("nyrhog");
 
         mockMvc.perform(get("/chats")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +171,6 @@ class ChatControllerTest {
     Long createTestChat() {
 
         CreateChatDto createChatDto = new CreateChatDto();
-        createChatDto.setUsername("nyrhog");
         createChatDto.setChatCreateProfileId(1L);
         createChatDto.setChatWithProfileId(2L);
 

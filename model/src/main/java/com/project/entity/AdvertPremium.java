@@ -28,10 +28,4 @@ public class AdvertPremium {
     @Column(name = "premium_end")
     private LocalDateTime premEnd;
 
-//    @OneToOne(
-//            mappedBy = "advertPremium",
-//            cascade = CascadeType.ALL,
-//            fetch = FetchType.LAZY
-//    )
-//    private Advert advert;
 }

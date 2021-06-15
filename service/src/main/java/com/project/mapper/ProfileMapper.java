@@ -20,6 +20,6 @@ public interface ProfileMapper {
     @Mapping(target = "profile.name", source = "dto.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "profile.surname", source = "dto.surname", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "profile.phoneNumber", source = "dto.phoneNumber", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateAdvert(@MappingTarget Profile profile, ProfileUpdateDto dto);
+    void updateProfile(@MappingTarget Profile profile, ProfileUpdateDto dto);
 
 }

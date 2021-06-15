@@ -2,6 +2,7 @@ package com.project.controller;
 
 import com.project.dto.*;
 import com.project.service.IAdvertService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -14,16 +15,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/adverts")
+@RequiredArgsConstructor
 public class AdvertController {
 
     private final IAdvertService advertService;
 
-    @Autowired
-    public AdvertController(IAdvertService advertService) {
-        this.advertService = advertService;
-    }
-
-    @PreAuthorize("#createAdvertDto.username == authentication.principal.username")
     @PostMapping
     public ResponseEntity<Void> createAdvert(@RequestBody @Valid CreateAdvertDto createAdvertDto) {
 
@@ -31,7 +27,7 @@ public class AdvertController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("#updateAdvertDto.username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @PatchMapping
     public ResponseEntity<Void> updateAdvert(@RequestBody UpdateAdvertDto updateAdvertDto) {
 
@@ -39,7 +35,7 @@ public class AdvertController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("#deleteAdvertDto.username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @DeleteMapping
     public ResponseEntity<DeleteAdvertDto> deleteAdvert(@RequestBody @Valid DeleteAdvertDto deleteAdvertDto) {
 
@@ -48,14 +44,13 @@ public class AdvertController {
     }
 
     @PatchMapping("/comment")
-    @PreAuthorize("#commentDto.username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateComment(@Valid @RequestBody EditCommentDto commentDto) {
 
         advertService.editComment(commentDto);
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("#commentaryDto.username == authentication.principal.username")
     @PostMapping("/comment")
     public ResponseEntity<Void> addComment(@Valid @RequestBody CommentaryDto commentaryDto) {
 
@@ -63,13 +58,11 @@ public class AdvertController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("#username == authentication.principal.username or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/comment")
-    public ResponseEntity<Void> deleteComment(@RequestParam Long id,
-                                              @RequestParam String username) {
+    public ResponseEntity<Void> deleteComment(@RequestParam Long id) {
 
         advertService.deleteComment(id);
-
         return ResponseEntity.ok().build();
     }
 

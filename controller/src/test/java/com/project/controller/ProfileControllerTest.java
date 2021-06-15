@@ -49,15 +49,12 @@ class ProfileControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final AdvertRepository advertRepository;
     private final ProfileRepository profileRepository;
     private final IUserService userService;
     private final RatingRepository ratingRepository;
-    private User user;
 
     @Autowired
-    public ProfileControllerTest(AdvertRepository advertRepository, ProfileRepository profileRepository, IUserService userService, RatingRepository ratingRepository) {
-        this.advertRepository = advertRepository;
+    public ProfileControllerTest(ProfileRepository profileRepository, IUserService userService, RatingRepository ratingRepository) {
         this.profileRepository = profileRepository;
         this.userService = userService;
         this.ratingRepository = ratingRepository;
@@ -73,7 +70,7 @@ class ProfileControllerTest {
         requestDto.setUsername("nyrhog");
         requestDto.setPhoneNumber("123123123");
 
-        user = new User();
+        User user = new User();
 
         Profile profile = new Profile()
                 .setName(requestDto.getFirstName())
@@ -95,7 +92,6 @@ class ProfileControllerTest {
     void updateProfile() throws Exception {
 
         ProfileUpdateDto updateDto = new ProfileUpdateDto();
-        updateDto.setUsername("nyrhog");
         updateDto.setName("NewName");
         updateDto.setId(1L);
 
@@ -114,6 +110,8 @@ class ProfileControllerTest {
         String newName = profile.getName();
         assertEquals("NewName", newName);
 
+        profile.setName("asd");
+        profileRepository.save(profile);
     }
 
     @Test
@@ -123,7 +121,6 @@ class ProfileControllerTest {
         RateDto rateDto = new RateDto();
         rateDto.setRate(2.5d);
         rateDto.setProfileId(1L);
-        rateDto.setUsername("nyrhog");
 
         mockMvc.perform(put("/profiles/rate")
                 .contentType(MediaType.APPLICATION_JSON)

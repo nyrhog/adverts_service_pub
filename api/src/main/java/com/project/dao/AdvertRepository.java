@@ -18,7 +18,6 @@ public interface AdvertRepository extends JpaRepository<Advert, Long> {
             "WHERE a.status = 'CLOSED' and p.id = ?1")
     Page<Advert> getAllClosedAdvertsWithProfileId(Long profileId, Pageable page);
 
-    @EntityGraph
-    @Override
-    Optional<Advert> findById(Long aLong);
+    Optional<Advert> getAdvertByIdAndProfile_User_Username(Long id, String username);
+
 }

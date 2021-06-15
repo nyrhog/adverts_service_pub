@@ -8,7 +8,4 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface CommentMapper {
 
-    @Mapping(target = "profileName", source = "comment.profile.name")
-    CommentDto toCommentDto(Comment comment);
-
 }

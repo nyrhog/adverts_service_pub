@@ -55,11 +55,6 @@ class AdminControllerTest {
         this.userRepository = userRepository;
     }
 
-    @BeforeEach
-    private void init(){
-
-    }
-
     @AfterEach
     private void resetDb() {
         userRepository.deleteAll();

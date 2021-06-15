@@ -8,8 +8,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class GetChatDto {
 
-   @NotBlank
-   private String username;
    @NotNull
    private Long chatId;
 }

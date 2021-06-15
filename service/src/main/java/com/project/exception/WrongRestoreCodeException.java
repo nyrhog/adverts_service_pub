@@ -1,4 +1,4 @@
-package com.project.exceprion;
+package com.project.exception;
 
 public class WrongRestoreCodeException extends RuntimeException{
     public WrongRestoreCodeException() {

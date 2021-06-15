@@ -8,10 +8,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CommentaryDto {
 
-    @NotBlank
-    private String username;
-    @NotNull
-    private Long senderId;
     @NotNull
     private Long advertId;
     @NotBlank
