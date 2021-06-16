@@ -3,8 +3,10 @@ package com.project.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,7 @@ public class Profile {
     private String phoneNumber;
 
     @org.hibernate.annotations.Formula(
-           "(select avg(r.rating) from ratings r where r.profile_id = id)"
+           "(select avg(r.rating) from ratings r where r.profile_id_recipient = id)"
     )
     private Double ratingValue;
 

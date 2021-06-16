@@ -1,6 +1,7 @@
 package com.project.controller;
 
 import com.project.dto.*;
+import com.project.entity.BillingDetails;
 import com.project.service.IAdvertService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
@@ -69,12 +72,15 @@ public class AdvertController {
     @GetMapping
     public ResponseEntity<Page<AdvertDto>> getAdverts(@RequestParam String category,
                                                       @RequestParam Integer size,
-                                                      @RequestParam Integer pageNumber) {
+                                                      @RequestParam Integer pageNumber,
+                                                      @RequestParam(required = false) String search
+    ) {
         Integer realPage = pageNumber - 1;
         AdvertListDto advertListDto = new AdvertListDto();
         advertListDto.setCategories(List.of(category));
         advertListDto.setPageSize(size);
         advertListDto.setPageNumber(realPage);
+        advertListDto.setSearch(search);
 
         Page<AdvertDto> adverts = advertService.getAdverts(advertListDto);
 
@@ -96,5 +102,14 @@ public class AdvertController {
         AdvertDto advert = advertService.getOneAdvert(id);
 
         return new ResponseEntity<>(advert, HttpStatus.OK);
+    }
+
+    @GetMapping("/billing")
+    public ResponseEntity<BillingDetailsDto> getBillingDetails(@RequestParam Long advertId,
+                                                              @Valid @Min(3) @Max(14) @RequestParam Integer days){
+
+        BillingDetailsDto billingDetails = advertService.getBillingDetails(advertId, days);
+        return new ResponseEntity<>(billingDetails, HttpStatus.OK);
+
     }
 }

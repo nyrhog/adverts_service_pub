@@ -5,6 +5,7 @@ import com.project.dao.*;
 import com.project.dto.*;
 import com.project.entity.*;
 import com.project.mapper.AdvertMapper;
+import com.project.mapper.BillingDetailsMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class AdvertService implements IAdvertService {
 
     private final ProfileRepository profileRepository;
@@ -32,10 +34,15 @@ public class AdvertService implements IAdvertService {
     private final CommentRepository commentRepository;
     private final AdvertPremiumRepository advertPremiumRepository;
     private final CustomizedAdvertRepository<Advert> customizedAdvertRepository;
-    private final AdvertMapper mapper;
+    private final BillingDetailsRepository billingDetailsRepository;
+    private final BillingDetailsMapper billingDetailsMapper;
+    private final AdvertMapper advertMapper;
 
     @Value("${premiumDays}")
     private Integer premiumDays;
+
+    @Value("${pricePerDay}")
+    private int pricePerDay;
 
     private static final String ADVERT_NOT_FOUND = "Advert with id: %s not found";
     private static final String PROFILE_NOT_FOUND = "Profile with id: %s not found";
@@ -79,7 +86,7 @@ public class AdvertService implements IAdvertService {
         Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(advertDto.getAdvertId(), currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
 
-        mapper.updateAdvert(advert, advertDto);
+        advertMapper.updateAdvert(advert, advertDto);
 
         advert.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
 
@@ -102,9 +109,11 @@ public class AdvertService implements IAdvertService {
 
     @Transactional
     @Override
-    public void enablePremiumStatus(Long advertId, Integer premDays) {
+    public void enablePremiumStatus(Long advertId) {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
+
+        Integer premDays = advert.getBillingDetails().getDays();
 
         if(premDays == null){
             premDays = premiumDays;
@@ -115,6 +124,7 @@ public class AdvertService implements IAdvertService {
                 .setPremStarted(LocalDateTime.now())
                 .setPremEnd(LocalDateTime.now().plusDays(premDays));
 
+        billingDetailsRepository.delete(advert.getBillingDetails());
         log.info("Premium status was enabled to advert with id: " + advertId);
     }
 
@@ -178,6 +188,7 @@ public class AdvertService implements IAdvertService {
 
         Integer pageNumber = advertDto.getPageNumber();
         Integer pageSize = advertDto.getPageSize();
+        String search = advertDto.getSearch();
 
         List<String> replacedCategories = replaceCharsInCategories(advertDto.getCategories());
 
@@ -186,12 +197,12 @@ public class AdvertService implements IAdvertService {
                 .map(Category::getCategoryName)
                 .collect(Collectors.toList());
 
-        Page<Advert> adverts = customizedAdvertRepository.findAllByCategoriesIn(categoriesNames,
+        Page<Advert> adverts = customizedAdvertRepository.findAllByCategoriesIn(categoriesNames, search,
                 PageRequest.of(pageNumber, pageSize));
 
         List<AdvertDto> advertDtoList = adverts.getContent()
                 .stream()
-                .map((mapper::toAdvertDto))
+                .map((advertMapper::toAdvertDto))
                 .collect(Collectors.toList());
 
         log.info("Adverts was taken");
@@ -223,7 +234,7 @@ public class AdvertService implements IAdvertService {
                 PageRequest.of(page, size, Sort.by(Advert_.CLOSED).descending()));
 
         List<AdvertDto> advertListDto = advertList.getContent().stream()
-                .map(mapper::toAdvertDto)
+                .map(advertMapper::toAdvertDto)
                 .collect(Collectors.toList());
 
         log.info("Selling history was taking");
@@ -236,9 +247,51 @@ public class AdvertService implements IAdvertService {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
 
-        AdvertDto advertDto = mapper.toAdvertDto(advert);
+        AdvertDto advertDto = advertMapper.toAdvertDto(advert);
 
         log.info("Advert was got with id: " + advertId);
         return advertDto;
+    }
+
+    @Override
+    @Transactional
+    public BillingDetailsDto getBillingDetails(Long advertId, Integer days) {
+
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(advertId, currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
+
+        BillingDetails details;
+        String billingCount;
+
+        if(advert.getBillingDetails() != null){
+            return billingDetailsMapper.toBillingDetailsDto(advert.getBillingDetails());
+        }
+
+        do{
+            billingCount = generateBillingCount().toString();
+            details = billingDetailsRepository.findBillingDetailsByPaymentCount(billingCount);
+            if(details == null){
+                break;
+            }
+        } while (details.getPaymentCount().equals(billingCount));
+
+        BillingDetails billingDetails = new BillingDetails();
+        billingDetails.setPaymentCount(billingCount);
+        billingDetails.setAdvert(advert);
+        billingDetails.setPrice((double) (pricePerDay * days));
+        billingDetails.setDays(days);
+
+        advert.setBillingDetails(billingDetails);
+
+        return billingDetailsMapper.toBillingDetailsDto(billingDetails);
+    }
+
+    private Long generateBillingCount() {
+        long leftLimit = 1_000_000_000_000L;
+        long rightLimit = 9_999_999_999_999L;
+
+        return leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
     }
 }

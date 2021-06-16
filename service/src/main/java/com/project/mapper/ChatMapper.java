@@ -7,7 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper
 public interface ChatMapper {
 
-
-    ChatDto toChatDto(Chat chat);
+    ChatDto chatToChatDto(Chat chat);
 
 }

@@ -66,4 +66,7 @@ public class Advert {
     @ManyToOne
     @JoinColumn(name = "profile_id")
     private Profile profile;
+
+    @OneToOne(mappedBy = "advert", cascade = CascadeType.ALL)
+    private BillingDetails billingDetails;
 }

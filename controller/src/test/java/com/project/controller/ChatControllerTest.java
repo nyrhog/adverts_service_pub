@@ -66,11 +66,6 @@ class ChatControllerTest {
         this.messageRepository = messageRepository;
     }
 
-    @AfterEach
-    private void resetDb() {
-//        chatRepository.deleteAll();
-    }
-
     @BeforeAll
     private void initBefore() {
         RegistrationDto requestDto = new RegistrationDto();
@@ -118,7 +113,6 @@ class ChatControllerTest {
 
         SendMessageDto sendMessageDto = new SendMessageDto();
         sendMessageDto.setRecipientIdProfile(2L);
-        sendMessageDto.setSenderIdProfile(1L);
         sendMessageDto.setText("Message");
 
         createTestChat();
@@ -139,15 +133,11 @@ class ChatControllerTest {
     @WithMockUser(username = "nyrhog")
      void getChat() throws Exception {
 
-        Long testChatId = createTestChat();
+        createTestChat();
 
-        GetChatDto dto = new GetChatDto();
-        dto.setChatId(testChatId);
-
-        mockMvc.perform(get("/chats")
+        mockMvc.perform(get("/chats/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -168,14 +158,13 @@ class ChatControllerTest {
         userService.register(user);
     }
 
-    Long createTestChat() {
+    void createTestChat() {
 
         CreateChatDto createChatDto = new CreateChatDto();
         createChatDto.setChatCreateProfileId(1L);
         createChatDto.setChatWithProfileId(2L);
 
         chatService.createChat(createChatDto);
-        return chatRepository.findAll().get(0).getId();
     }
 
 }

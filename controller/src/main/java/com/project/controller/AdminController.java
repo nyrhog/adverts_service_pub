@@ -41,10 +41,9 @@ public class AdminController {
     }
 
     @PatchMapping("/premium")
-    public ResponseEntity<Void> enablePremiumAdvert(@RequestParam Long id,
-                                                    @RequestParam(required = false) Integer days) {
+    public ResponseEntity<Void> enablePremiumAdvert(@RequestParam Long id) {
 
-        advertService.enablePremiumStatus(id, days);
+        advertService.enablePremiumStatus(id);
 
         return ResponseEntity.noContent().build();
     }

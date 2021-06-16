@@ -31,7 +31,7 @@ public class AuthController {
     private final IUserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDto> login(@RequestBody AuthenticationRequestDto requestDto) {
+    public ResponseEntity<ResponseDto> login(@Valid @RequestBody AuthenticationRequestDto requestDto) {
 
         String username = requestDto.getUsername();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));

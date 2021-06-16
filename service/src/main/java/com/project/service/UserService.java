@@ -23,6 +23,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;

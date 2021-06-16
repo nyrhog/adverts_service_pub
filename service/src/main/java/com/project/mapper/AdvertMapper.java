@@ -7,10 +7,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AdvertMapper {
-
     AdvertDto toAdvertDto(Advert advert);
 
     @Mapping(target = "advert.adName", source = "dto.adName", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -20,6 +20,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class ChatService implements IChatService {
 
     private final ProfileRepository profileRepository;
@@ -42,7 +43,7 @@ public class ChatService implements IChatService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, createChatDto.getChatCreateProfileId())));
 
         if (isChatExist(chatCreator, recipient)) {
-            log.info("Chat is exist");
+            log.info("Chat between {} and {} is exist", chatCreator.getName(), recipient.getName());
             return;
         }
 
@@ -61,7 +62,7 @@ public class ChatService implements IChatService {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Profile messageSender = profileRepository.getProfileByUserUsername(currentPrincipalName)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, messageDto.getSenderIdProfile())));
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
 
         Chat chat = chatRepository.getChatByProfilesIdIn(messageSender.getId(), messageDto.getRecipientIdProfile());
 
@@ -138,7 +139,7 @@ public class ChatService implements IChatService {
         boolean contains = profile.getChats().contains(chat);
 
         if (contains){
-            ChatDto chatDto = mapper.toChatDto(chat);
+            ChatDto chatDto = mapper.chatToChatDto(chat);
 
             log.info("Chat was got");
             return chatDto;

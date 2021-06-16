@@ -9,8 +9,6 @@ import javax.validation.constraints.NotNull;
 public class SendMessageDto {
 
     @NotNull
-    private Long senderIdProfile;
-    @NotNull
     private Long recipientIdProfile;
     @NotBlank
     private String text;

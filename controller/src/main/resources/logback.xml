@@ -32,15 +32,61 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="RollingFileHibernate"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/hibernate.log</file>
+        <encoder
+                class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+        </encoder>
+
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/hibernate-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="RollingFileMainProject"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/adverts.log</file>
+        <encoder
+                class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+        </encoder>
+
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOGS}/archived/adverts-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
     <!-- LOG everything at INFO level -->
     <root level="info">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </root>
 
-    <logger name="com.project" level="trace" additivity="false">
-        <appender-ref ref="RollingFile" />
+    <logger name="com.project" level="info" additivity="false">
+        <appender-ref ref="RollingFileMainProject" />
         <appender-ref ref="Console" />
     </logger>
+
+    <logger name="org.hibernate" level="info" additivity="false">
+        <appender-ref ref="RollingFileHibernate" />
+        <appender-ref ref="Console" />
+    </logger>
+
 
 </configuration>

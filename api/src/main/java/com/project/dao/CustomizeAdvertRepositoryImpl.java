@@ -20,7 +20,7 @@ public class CustomizeAdvertRepositoryImpl implements CustomizedAdvertRepository
     private EntityManager entityManager;
 
     @Override
-    public Page<Advert> findAllByCategoriesIn(List<String> categories, Pageable page) {
+    public Page<Advert> findAllByCategoriesIn(List<String> categories, String search, Pageable page) {
 
         Long singleResult = getCategoryJoinCount();
 
@@ -36,10 +36,19 @@ public class CustomizeAdvertRepositoryImpl implements CustomizedAdvertRepository
         orders.add(cb.desc(advertProfileJoin.get(Profile_.RATING_VALUE)));
         orders.add(cb.desc(root.get(Advert_.CREATED)));
 
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(advertCategoryJoin.get(Category_.CATEGORY_NAME).in(categories));
+        predicates.add(cb.equal(root.get(Advert_.STATUS), Status.ACTIVE));
+
+
+        if(search != null && !search.trim().isEmpty()){
+            predicates.add(cb.like(root.get(Advert_.AD_NAME), String.format("%%%s%%", search)));
+        }
+
         cq.select(root)
-                .where(cb.and(advertCategoryJoin.get(Category_.CATEGORY_NAME).in(categories),
-                        cb.equal(root.get(Advert_.STATUS), Status.ACTIVE)))
+                .where(predicates.toArray(new Predicate[0]))
                 .orderBy(orders);
+
 
         return createPagedResult(cq, page, singleResult);
     }
@@ -60,10 +69,11 @@ public class CustomizeAdvertRepositoryImpl implements CustomizedAdvertRepository
                 .where(
                         cb.and
                                 (cb.equal(advertProfileJoin.get(Profile_.ID), id),
-                                        cb.equal(root.get(Advert_.STATUS), Status.CLOSED)
+                                 cb.equal(root.get(Advert_.STATUS), Status.CLOSED)
                                 )
                 )
                 .orderBy(orders);
+
 
         return createPagedResult(cq, page, singleResult);
     }
@@ -92,7 +102,8 @@ public class CustomizeAdvertRepositoryImpl implements CustomizedAdvertRepository
         Root<Advert> root = cq.from(Advert.class);
         root.join(Advert_.CATEGORIES);
 
-        cq.select(cb.count(root));
+        cq.select(cb.count(root)).
+                where(cb.equal(root.get(Advert_.STATUS), Status.ACTIVE));
 
         return entityManager.createQuery(cq).getSingleResult();
     }
@@ -107,7 +118,7 @@ public class CustomizeAdvertRepositoryImpl implements CustomizedAdvertRepository
         cq.select(cb.count(root)).where(
                 cb.and
                         (cb.equal(join.get(Profile_.ID), profileId),
-                                cb.equal(root.get(Advert_.STATUS), Status.CLOSED)
+                         cb.equal(root.get(Advert_.STATUS), Status.CLOSED)
                         )
         );
 

@@ -20,7 +20,10 @@ public class Rating {
     private Double rating;
 
     @ManyToOne
-    @JoinColumn(name = "profile_id")
-    private Profile profile;
+    @JoinColumn(name = "profile_id_recipient")
+    private Profile profileRecipient;
 
+    @ManyToOne
+    @JoinColumn(name = "profile_id_sender")
+    private Profile profileSender;
 }

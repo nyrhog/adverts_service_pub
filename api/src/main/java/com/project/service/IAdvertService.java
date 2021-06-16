@@ -9,12 +9,13 @@ public interface IAdvertService {
     void createAdvert(CreateAdvertDto advertDto);
     void updateAdvert(UpdateAdvertDto advertDto);
     void deleteAdvert(DeleteAdvertDto advertDto);
-    void enablePremiumStatus(Long advertId, Integer premDays);
+    void enablePremiumStatus(Long advertId);
     void addCommentaryToAdvert(CommentaryDto commentaryDto);
     void deleteComment(Long commentId);
     void editComment(EditCommentDto editCommentDto);
     Page<AdvertDto> getAdverts(AdvertListDto advertDto);
     Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size);
     AdvertDto getOneAdvert(Long advertId);
+    BillingDetailsDto getBillingDetails(Long id, Integer days);
 
 }

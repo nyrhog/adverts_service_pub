@@ -1,6 +1,7 @@
 package com.project.dto;
 
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -10,22 +11,23 @@ import javax.validation.constraints.Pattern;
 public class RegistrationDto {
 
     @NotNull
-    String username;
+    private String username;
 
     @NotNull
-    String password;
+    private String password;
 
     @NotNull
     @Email(message = "Invalid email address!")
-    String email;
+    private String email;
 
     @NotNull
-    String firstName;
+    private String firstName;
 
     @NotNull
-    String surname;
+    private String surname;
 
+    @Length(min = 9, max = 9)
     @NotNull
-    String phoneNumber;
+    private String phoneNumber;
 
 }

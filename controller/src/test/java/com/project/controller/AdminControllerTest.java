@@ -89,29 +89,5 @@ class AdminControllerTest {
         assertTrue(user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")));
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "ADMIN")
-    void enablePremiumAdvert() throws Exception {
 
-        AdvertPremium advertPremium = new AdvertPremium();
-        advertPremium.setIsActive(false);
-
-        Advert advert = new Advert();
-        advert.setAdvertPremium(advertPremium);
-        advert.setAdName("asd");
-        advert.setAdPrice(123d);
-        advert.setStatus(Status.ACTIVE);
-
-        advertRepository.save(advert);
-
-        mockMvc.perform(patch("/admin/premium?id=1&days=10")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        advert = advertRepository.findById(1L).orElse(null);
-
-        assertNotNull(advert);
-        assertTrue(advert.getAdvertPremium().getIsActive());
-    }
 }
