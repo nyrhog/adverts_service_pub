@@ -8,11 +8,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class EditCommentDto {
 
-    @NotBlank
-    private String username;
-    @NotNull
+    @NotNull(message = "Required comment id!")
     private Long commentId;
-    @NotBlank
+    @NotBlank(message = "Required new comment text!")
     private String newCommentText;
 
 }

@@ -1,11 +1,9 @@
 package com.project.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.AdvertsServiceApplication;
 import com.project.dao.*;
 import com.project.dto.CreateChatDto;
-import com.project.dto.GetChatDto;
 import com.project.dto.RegistrationDto;
 import com.project.dto.SendMessageDto;
 import com.project.entity.Chat;
@@ -14,7 +12,6 @@ import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.service.IChatService;
 import com.project.service.IUserService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -27,10 +24,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

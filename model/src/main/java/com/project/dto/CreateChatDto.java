@@ -8,10 +8,10 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateChatDto {
 
-    @NotNull
+    @NotNull(message = "Required profile id!")
     private Long chatCreateProfileId;
 
-    @NotNull
+    @NotNull(message = "Required profile id!")
     private Long chatWithProfileId;
 
 }

@@ -8,9 +8,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CommentaryDto {
 
-    @NotNull
+    @NotNull(message = "Required advert id!")
     private Long advertId;
-    @NotBlank
+    @NotBlank(message = "Required commentary text!")
     private String commentaryMessage;
 
 }

@@ -8,9 +8,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class RateDto {
 
-    @NotNull
+    @NotNull(message = "Required profile id")
     private Long profileId;
-    @NotNull
+    @NotNull(message = "Required rate value")
     private Double rate;
 
 }

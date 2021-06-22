@@ -14,10 +14,6 @@ dependencies {
     implementation(project(":security"))
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVers}"
 
-//    compile group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.1.6'
-//    compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.2'
-
-//    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
     // https://mvnrepository.com/artifact/com.h2database/h2
     testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'

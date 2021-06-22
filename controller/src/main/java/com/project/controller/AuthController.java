@@ -62,7 +62,7 @@ public class AuthController {
 
 
         userService.register(user);
-        return ResponseEntity.created(URI.create(String.format("/users/%s", user.getUsername()))).build();
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/restore-password")

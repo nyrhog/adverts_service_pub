@@ -40,8 +40,8 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/premium")
-    public ResponseEntity<Void> enablePremiumAdvert(@RequestParam Long id) {
+    @PatchMapping("/premium/{id}")
+    public ResponseEntity<Void> enablePremiumAdvert(@PathVariable Long id) {
 
         advertService.enablePremiumStatus(id);
 

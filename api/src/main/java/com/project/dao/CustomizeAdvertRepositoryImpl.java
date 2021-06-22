@@ -22,7 +22,7 @@ public class CustomizeAdvertRepositoryImpl implements CustomizedAdvertRepository
     @Override
     public Page<Advert> findAllByCategoriesIn(List<String> categories, String search, Pageable page) {
 
-        Long singleResult = getCategoryJoinCount();
+        Long singleResult = getCategoryJoinCount(categories);
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Advert> cq = cb.createQuery(Advert.class);
@@ -95,15 +95,19 @@ public class CustomizeAdvertRepositoryImpl implements CustomizedAdvertRepository
         return result;
     }
 
-    private Long getCategoryJoinCount() {
+    private Long getCategoryJoinCount(List<String> categories) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Advert> root = cq.from(Advert.class);
-        root.join(Advert_.CATEGORIES);
+        Join<Object, Object> join = root.join(Advert_.CATEGORIES);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(join.get(Category_.CATEGORY_NAME).in(categories));
+        predicates.add(cb.equal(root.get(Advert_.STATUS), Status.ACTIVE));
 
         cq.select(cb.count(root)).
-                where(cb.equal(root.get(Advert_.STATUS), Status.ACTIVE));
+                where(predicates.toArray(new Predicate[0]));
 
         return entityManager.createQuery(cq).getSingleResult();
     }

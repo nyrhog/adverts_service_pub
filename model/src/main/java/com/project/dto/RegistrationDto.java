@@ -10,24 +10,24 @@ import javax.validation.constraints.Pattern;
 @Data
 public class RegistrationDto {
 
-    @NotNull
+    @NotNull(message = "Required username")
     private String username;
 
-    @NotNull
+    @NotNull(message = "Required password")
     private String password;
 
     @NotNull
     @Email(message = "Invalid email address!")
     private String email;
 
-    @NotNull
+    @NotNull(message = "Required first name")
     private String firstName;
 
-    @NotNull
+    @NotNull(message = "Required second name")
     private String surname;
 
     @Length(min = 9, max = 9)
-    @NotNull
+    @NotNull(message = "Required phone number")
     private String phoneNumber;
 
 }

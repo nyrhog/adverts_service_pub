@@ -29,6 +29,7 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final MailSender mailSender;
 
     @Override
     public User register(User user) {
@@ -40,26 +41,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
-    }
-
-    @Override
-    public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public void delete(Long id) {
-
-        User user = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        user.setStatus(UserStatus.DELETED);
-
     }
 
     @Override
@@ -81,7 +64,6 @@ public class UserService implements IUserService {
         String email = user.getEmail();
 
         int code = saveRestoreCode(user);
-        MailSender mailSender = new MailSender();
 
         mailSender.send(email, code);
         log.info("Code was sent");
@@ -134,10 +116,5 @@ public class UserService implements IUserService {
 
         log.info("IN register - user: {} successfully registered", registeredUser.getUsername());
         return registeredUser;
-    }
-
-    @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(new User());
     }
 }

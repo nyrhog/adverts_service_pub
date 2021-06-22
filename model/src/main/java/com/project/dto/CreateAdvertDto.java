@@ -10,14 +10,12 @@ import java.util.List;
 @Data
 public class CreateAdvertDto {
 
-    @NotNull
-    private Long profileId;
-    @NotBlank
+    @NotBlank(message = "Required advert name!")
     private String adName;
-    @NotNull
+    @NotNull(message = "Required advert price!")
     private Double adPrice;
-    @NotBlank
+    @NotBlank(message = "Required description!")
     private String description;
-    @NotEmpty
+    @NotEmpty(message = "Required at least one category!")
     private List<String> categories;
 }

@@ -7,9 +7,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class DeleteMessageDto {
 
-    @NotNull
+    @NotNull(message = "Required username!")
     private String username;
-    @NotNull
+    @NotNull(message = "Required message id!")
     private Long messageId;
 
 }

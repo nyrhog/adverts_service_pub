@@ -12,7 +12,7 @@ repositories {
 dependencies {
 //    compile group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springBootVers}"
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springBootVers}"
 
     compileOnly group: 'org.hibernate', name: 'hibernate-jpamodelgen', version: '5.4.31.Final'
     annotationProcessor('org.hibernate:hibernate-jpamodelgen:5.4.31.Final')

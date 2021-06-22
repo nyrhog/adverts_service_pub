@@ -40,7 +40,7 @@ public class ChatService implements IChatService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, createChatDto.getChatCreateProfileId())));
 
         Profile recipient = profileRepository.findById(createChatDto.getChatWithProfileId())
-                .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, createChatDto.getChatCreateProfileId())));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, createChatDto.getChatWithProfileId())));
 
         if (isChatExist(chatCreator, recipient)) {
             log.info("Chat between {} and {} is exist", chatCreator.getName(), recipient.getName());
@@ -132,7 +132,7 @@ public class ChatService implements IChatService {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
-                .orElseThrow(() -> new EntityNotFoundException());
+                .orElseThrow(() -> new EntityNotFoundException("Profile noy found"));
 
         Chat chat = chatRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
@@ -145,7 +145,7 @@ public class ChatService implements IChatService {
             return chatDto;
         }
 
-        throw new EntityNotFoundException();
+        throw new EntityNotFoundException("This profile doesn't have current chat");
     }
 
 }

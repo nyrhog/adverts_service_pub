@@ -12,6 +12,7 @@ public class AdvertDto {
     private ProfileDto profile;
     private String adName;
     private Double adPrice;
+    private String description;
     private Status status;
     private LocalDateTime created;
     private LocalDateTime updated;

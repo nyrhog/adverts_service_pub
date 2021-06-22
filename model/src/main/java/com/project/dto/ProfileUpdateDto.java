@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProfileUpdateDto {
 
-    @NotNull
+    @NotNull(message = "Required profile id")
     private Long id;
     private String name;
     private String surname;

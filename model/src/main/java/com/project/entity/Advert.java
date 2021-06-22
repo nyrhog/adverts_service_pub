@@ -48,7 +48,7 @@ public class Advert {
     @JoinColumn(name = "advert_premium_id", referencedColumnName = "id")
     private AdvertPremium advertPremium;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(
             name = "adverts_categories",
             joinColumns = {@JoinColumn(name = "adverts_id")},

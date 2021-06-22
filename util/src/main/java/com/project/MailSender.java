@@ -24,7 +24,6 @@ public class MailSender {
             from = properties.getProperty("email");
             password = properties.getProperty("password");
         }
-
     }
 
     @SneakyThrows

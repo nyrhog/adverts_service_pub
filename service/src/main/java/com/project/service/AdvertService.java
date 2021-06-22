@@ -8,12 +8,14 @@ import com.project.mapper.AdvertMapper;
 import com.project.mapper.BillingDetailsMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
@@ -38,6 +40,9 @@ public class AdvertService implements IAdvertService {
     private final BillingDetailsMapper billingDetailsMapper;
     private final AdvertMapper advertMapper;
 
+    @Autowired
+    private AdvertService advertService;
+
     @Value("${premiumDays}")
     private Integer premiumDays;
 
@@ -48,13 +53,12 @@ public class AdvertService implements IAdvertService {
     private static final String PROFILE_NOT_FOUND = "Profile with id: %s not found";
     private static final String COMMENTARY_NOT_FOUND = "Commentary with id: %s not found";
 
-    @Transactional
     @Override
     public void createAdvert(CreateAdvertDto advertDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, advertDto.getProfileId())));
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
 
         List<Category> categories = categoryRepository.findByCategoryNameIn(advertDto.getCategories());
 
@@ -71,20 +75,32 @@ public class AdvertService implements IAdvertService {
 
         categories.forEach(category -> category.getAdverts().add(advert));
 
-        advertsRepository.saveAndFlush(advert);
+        advertsRepository.save(advert);
 
         profile.getAdverts().add(advert);
 
         log.info("Advert was created");
     }
 
-    @Transactional
+
     @Override
     public void updateAdvert(UpdateAdvertDto advertDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
-        Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(advertDto.getAdvertId(), currentPrincipalName)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
+        Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+
+        Advert advert;
+
+        if (UtilServiceClass.isAdmin(profile)) {
+            advert = advertsRepository.findById(advertDto.getAdvertId())
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
+            log.info("User is an admin");
+        } else {
+            advert = advertsRepository.getAdvertByIdAndProfile_User_Username(advertDto.getAdvertId(), currentPrincipalName)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
+            log.info("User is not an admin");
+        }
 
         advertMapper.updateAdvert(advert, advertDto);
 
@@ -93,21 +109,51 @@ public class AdvertService implements IAdvertService {
         log.info("Advert was updated");
     }
 
-    @Transactional
     @Override
-    public void deleteAdvert(DeleteAdvertDto advertDto) {
+    public void deleteAdvert(Long id) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
-        Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(advertDto.getAdvertId(), currentPrincipalName)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertDto.getAdvertId())));
+        Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+
+        Advert advert;
+
+        if (UtilServiceClass.isAdmin(profile)) {
+            advert = advertsRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, id)));
+        } else {
+            advert = advertsRepository.getAdvertByIdAndProfile_User_Username(id, currentPrincipalName)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, id)));
+        }
 
         advertsRepository.delete(advert);
 
         log.info("Advert was deleted");
     }
 
-    @Transactional
+    @Override
+    public void closeAdvert(Long id) {
+        String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
+
+        Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(id, currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, id)));
+
+        advert.setStatus(Status.CLOSED);
+        log.info("Advert was closed");
+    }
+
+    @Override
+    public List<AdvertDto> getProfileActiveAdverts(Long profileId) {
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, profileId)));
+
+        List<Advert> adverts = advertsRepository.getAdvertsByProfileAndStatus(profile, Status.ACTIVE);
+
+        return adverts.stream()
+                .map(advertMapper::toAdvertDto).collect(Collectors.toList());
+    }
+
     @Override
     public void enablePremiumStatus(Long advertId) {
         Advert advert = advertsRepository.findById(advertId)
@@ -115,7 +161,7 @@ public class AdvertService implements IAdvertService {
 
         Integer premDays = advert.getBillingDetails().getDays();
 
-        if(premDays == null){
+        if (premDays == null) {
             premDays = premiumDays;
         }
 
@@ -128,14 +174,13 @@ public class AdvertService implements IAdvertService {
         log.info("Premium status was enabled to advert with id: " + advertId);
     }
 
-    @Transactional
     @Override
     public void addCommentaryToAdvert(CommentaryDto commentaryDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Advert advert = advertsRepository
-                .getAdvertByIdAndProfile_User_Username(commentaryDto.getAdvertId(), currentPrincipalName)
+                .findById(commentaryDto.getAdvertId())
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, commentaryDto.getAdvertId())));
 
         Profile sender = profileRepository
@@ -153,38 +198,55 @@ public class AdvertService implements IAdvertService {
         log.info("Commentary was added");
     }
 
-    @Transactional
     public void deleteComment(Long commentId) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
-        Comment comment = commentRepository
-                .getCommentByIdAndProfile_User_Username(commentId, currentPrincipalName)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, commentId)));
+        Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+
+        Comment comment;
+
+        if (UtilServiceClass.isAdmin(profile)) {
+            comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, commentId)));
+        } else {
+            comment = commentRepository
+                    .getCommentByIdAndProfile_User_Username(commentId, currentPrincipalName)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, commentId)));
+        }
 
         commentRepository.delete(comment);
 
         log.info("Commentary was deleted");
     }
 
-    @Transactional
     public void editComment(EditCommentDto editCommentDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
-        Comment comment = commentRepository
-                .getCommentByIdAndProfile_User_Username(editCommentDto.getCommentId(), currentPrincipalName)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, editCommentDto.getCommentId())));
+        Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found"));
+
+        Comment comment;
+
+        if (UtilServiceClass.isAdmin(profile)) {
+            comment = commentRepository.findById(editCommentDto.getCommentId())
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, editCommentDto.getCommentId())));
+        } else {
+            comment = commentRepository
+                    .getCommentByIdAndProfile_User_Username(editCommentDto.getCommentId(), currentPrincipalName)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, editCommentDto.getCommentId())));
+        }
 
         comment.setCommentText(editCommentDto.getNewCommentText());
 
         log.info("Commentary was edited");
     }
 
-    @Transactional
     public Page<AdvertDto> getAdverts(AdvertListDto advertDto) {
 
-        disableExpiredPrems();
+        advertService.disableExpiredPrems();
 
         Integer pageNumber = advertDto.getPageNumber();
         Integer pageSize = advertDto.getPageSize();
@@ -209,13 +271,14 @@ public class AdvertService implements IAdvertService {
         return new PageImpl<>(advertDtoList, PageRequest.of(pageNumber, pageSize), adverts.getTotalElements());
     }
 
-    protected List<String> replaceCharsInCategories(List<String> categories) {
+    private List<String> replaceCharsInCategories(List<String> categories) {
         return categories.stream()
                 .map(category -> category.replace("_", " "))
                 .collect(Collectors.toList());
     }
 
-    protected void disableExpiredPrems() {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void disableExpiredPrems() {
         List<AdvertPremium> expiredPrems = advertPremiumRepository.getAllByPremEndLessThanAndIsActiveTrue(LocalDateTime.now());
 
         expiredPrems.forEach((advertPremium -> {
@@ -227,7 +290,6 @@ public class AdvertService implements IAdvertService {
     }
 
     @Override
-    @Transactional
     public Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size) {
 
         Page<Advert> advertList = advertsRepository.getAllClosedAdvertsWithProfileId(profileId,
@@ -242,8 +304,7 @@ public class AdvertService implements IAdvertService {
     }
 
     @Override
-    @Transactional
-    public AdvertDto getOneAdvert(Long advertId){
+    public AdvertDto getOneAdvert(Long advertId) {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
 
@@ -254,7 +315,6 @@ public class AdvertService implements IAdvertService {
     }
 
     @Override
-    @Transactional
     public BillingDetailsDto getBillingDetails(Long advertId, Integer days) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
@@ -265,14 +325,14 @@ public class AdvertService implements IAdvertService {
         BillingDetails details;
         String billingCount;
 
-        if(advert.getBillingDetails() != null){
+        if (advert.getBillingDetails() != null) {
             return billingDetailsMapper.toBillingDetailsDto(advert.getBillingDetails());
         }
 
-        do{
+        do {
             billingCount = generateBillingCount().toString();
             details = billingDetailsRepository.findBillingDetailsByPaymentCount(billingCount);
-            if(details == null){
+            if (details == null) {
                 break;
             }
         } while (details.getPaymentCount().equals(billingCount));

@@ -27,6 +27,7 @@ dependencies {
     implementation group: 'org.mapstruct', name: 'mapstruct', version: "${mapstructVersion}"
     annotationProcessor group: 'org.mapstruct',name: 'mapstruct-processor',version: "${mapstructVersion}"
 
+
 }
 
 test {

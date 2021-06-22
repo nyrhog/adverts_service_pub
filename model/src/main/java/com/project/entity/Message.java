@@ -1,6 +1,5 @@
 package com.project.entity;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "messages")
 @Getter
 @Setter
-@EqualsAndHashCode
 public class Message {
 
     @Id
@@ -33,5 +31,7 @@ public class Message {
     @org.hibernate.annotations.CreationTimestamp
     @Column(name = "message_write_time")
     private LocalDateTime writeTime;
+
+
 
 }

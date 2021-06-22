@@ -1,10 +1,8 @@
 package com.project.controller;
 
 import com.project.dto.*;
-import com.project.entity.BillingDetails;
 import com.project.service.IAdvertService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +25,7 @@ public class AdvertController {
     public ResponseEntity<Void> createAdvert(@RequestBody @Valid CreateAdvertDto createAdvertDto) {
 
         advertService.createAdvert(createAdvertDto);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
@@ -38,11 +36,18 @@ public class AdvertController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    @DeleteMapping
-    public ResponseEntity<DeleteAdvertDto> deleteAdvert(@RequestBody @Valid DeleteAdvertDto deleteAdvertDto) {
 
-        advertService.deleteAdvert(deleteAdvertDto);
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAdvert(@PathVariable Long id) {
+
+        advertService.deleteAdvert(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/close/{id}")
+    public ResponseEntity<Void> closeAdvert(@PathVariable Long id){
+        advertService.closeAdvert(id);
         return ResponseEntity.ok().build();
     }
 
@@ -111,5 +116,12 @@ public class AdvertController {
         BillingDetailsDto billingDetails = advertService.getBillingDetails(advertId, days);
         return new ResponseEntity<>(billingDetails, HttpStatus.OK);
 
+    }
+
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<List<AdvertDto>> getProfileAdverts(@PathVariable Long id){
+        List<AdvertDto> profileActiveAdverts = advertService.getProfileActiveAdverts(id);
+
+        return new ResponseEntity<>(profileActiveAdverts, HttpStatus.OK);
     }
 }

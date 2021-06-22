@@ -6,8 +6,8 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class AuthenticationRequestDto {
-    @NotBlank
+    @NotBlank(message = "Username must not be null")
     private String username;
-    @NotBlank
+    @NotBlank(message = "Password must not be null")
     private String password;
 }

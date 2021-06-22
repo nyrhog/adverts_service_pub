@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 public class AdvertListDto {
 
-    @NotEmpty
+    @NotEmpty(message = "Required at least one category!")
     private List<String> categories;
     private String search;
-    @NotNull
+    @NotNull(message = "Required page size")
     private Integer pageSize;
-    @NotNull
+    @NotNull(message = "Required page number")
     private Integer pageNumber;
 }
