@@ -21,7 +21,6 @@ import java.time.ZoneId;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class ProfileService implements IProfileService {
 
     private final ProfileRepository profileRepository;
@@ -81,7 +80,6 @@ public class ProfileService implements IProfileService {
         log.info("Profile with id:{} was rated with rate:{}", profileRecipient.getId(), rateDto.getRate());
     }
 
-    @Transactional
     @Override
     public ProfileDto getProfile(Long id) {
         Profile profile = profileRepository.findById(id)

@@ -11,4 +11,5 @@ repositories {
 
 dependencies {
     implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
+    compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.12.RELEASE'
 }

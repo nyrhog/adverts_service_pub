@@ -18,7 +18,7 @@ public class BillingDetails {
     @Column
     private String paymentCount;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advert_id", referencedColumnName = "id")
     private Advert advert;
 

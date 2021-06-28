@@ -11,15 +11,19 @@ import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.service.IUserService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -35,6 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
+@Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AuthControllerTest {
 
     @Autowired
@@ -49,15 +55,26 @@ class AuthControllerTest {
     @Autowired
     private IUserService userService;
 
-    @AfterEach
-    private void resetDb() {
-        userRepository.deleteAll();
+    @BeforeAll
+    @Rollback(value = false)
+    void init(){
+        User user = new User();
+
+        Profile profile = new Profile()
+                .setName("Kirill")
+                .setPhoneNumber("123123123")
+                .setSurname("Kananovich");
+
+        user.setPassword("test")
+                .setUsername("nyrhog")
+                .setEmail("xxxxxxxxx@gmail.ru")
+                .setProfile(profile);
+
+        userService.register(user);
     }
 
     @Test
     void login() throws Exception {
-
-        registerUser();
 
         AuthenticationRequestDto authenticationRequestDto = new AuthenticationRequestDto();
         authenticationRequestDto.setUsername("nyrhog");
@@ -73,12 +90,12 @@ class AuthControllerTest {
     }
 
     @Test
-    void registration_WithNoContentCodeResponse() throws Exception {
+    void registration() throws Exception {
 
         RegistrationDto registrationDto = new RegistrationDto();
-        registrationDto.setUsername("nyrhog");
+        registrationDto.setUsername("nyrhog2");
         registrationDto.setPassword("test");
-        registrationDto.setEmail("test@gmail.com");
+        registrationDto.setEmail("test22@gmail.com");
         registrationDto.setFirstName("Kirill");
         registrationDto.setSurname("Kananovich");
         registrationDto.setPhoneNumber("335553535");
@@ -95,7 +112,6 @@ class AuthControllerTest {
 
     @Test
     void sendMessage() throws Exception {
-        registerUser();
 
         mockMvc.perform(put("/auth/restore-password?username=nyrhog")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +126,6 @@ class AuthControllerTest {
 
     @Test
     void restorePassword() throws Exception {
-        registerUser();
         userService.sendMessageWithCode("nyrhog");
         User user = userRepository.findByUsername("nyrhog").orElse(null);
         Integer generatedValue = user.getGeneratedValue();
@@ -131,21 +146,5 @@ class AuthControllerTest {
         assertNull(user.getGeneratedValue());
     }
 
-
-    private void registerUser() {
-        User user = new User();
-
-        Profile profile = new Profile()
-                .setName("Kirill")
-                .setPhoneNumber("123123123")
-                .setSurname("Kananovich");
-
-        user.setPassword("test")
-                .setUsername("nyrhog")
-                .setEmail("xxxxxxxxx@gmail.ru")
-                .setProfile(profile);
-
-        userService.register(user);
-    }
 
 }

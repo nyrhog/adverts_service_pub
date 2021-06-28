@@ -10,9 +10,12 @@ import com.project.entity.UserStatus;
 import com.project.exception.WrongRestoreCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
@@ -23,13 +26,16 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final MailSender mailSender;
+    private final TemplateEngine templateEngine;
+
+    @Value("${message-title}")
+    private String messageTitle;
 
     @Override
     public User register(User user) {
@@ -46,6 +52,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public User registerAdminUser(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         Role adminRoleUser = roleRepository.findByName("ROLE_ADMIN");
@@ -65,7 +72,12 @@ public class UserService implements IUserService {
 
         int code = saveRestoreCode(user);
 
-        mailSender.send(email, code);
+        Context context = new Context();
+        context.setVariable("code", code);
+
+        String text = templateEngine.process("restore-password", context);
+
+        mailSender.send(email, text, messageTitle);
         log.info("Code was sent");
     }
 

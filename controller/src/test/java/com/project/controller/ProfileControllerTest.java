@@ -1,13 +1,11 @@
 package com.project.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.AdvertsServiceApplication;
 import com.project.dao.*;
 import com.project.dto.ProfileUpdateDto;
 import com.project.dto.RateDto;
 import com.project.dto.RegistrationDto;
-import com.project.entity.Category;
 import com.project.entity.Profile;
 import com.project.entity.Rating;
 import com.project.entity.User;
@@ -26,9 +24,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
+@Transactional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProfileControllerTest {
 
@@ -62,29 +58,40 @@ class ProfileControllerTest {
 
     @BeforeAll
     private void initBefore() {
-        RegistrationDto requestDto = new RegistrationDto();
-        requestDto.setFirstName("asd");
-        requestDto.setSurname("asd");
-        requestDto.setPassword("asd");
-        requestDto.setEmail("xxx@mail.ru");
-        requestDto.setUsername("nyrhog");
-        requestDto.setPhoneNumber("123123123");
+        RegistrationDto registrationDto = new RegistrationDto();
+        registrationDto.setFirstName("asd");
+        registrationDto.setSurname("asd");
+        registrationDto.setPassword("asd");
+        registrationDto.setEmail("xxx@mail.ru");
+        registrationDto.setUsername("nyrhog");
+        registrationDto.setPhoneNumber("123123123");
 
+        RegistrationDto registrationDto2 = new RegistrationDto();
+        registrationDto2.setFirstName("asd");
+        registrationDto2.setSurname("asd");
+        registrationDto2.setPassword("asd");
+        registrationDto2.setEmail("xxx2@mail.ru");
+        registrationDto2.setUsername("nyrhog2");
+        registrationDto2.setPhoneNumber("123123123");
+
+        registerUser(registrationDto);
+        registerUser(registrationDto2);
+    }
+
+    private void registerUser(RegistrationDto registrationDto){
         User user = new User();
-
         Profile profile = new Profile()
-                .setName(requestDto.getFirstName())
-                .setPhoneNumber(requestDto.getPhoneNumber())
-                .setSurname(requestDto.getSurname());
+                .setName(registrationDto.getFirstName())
+                .setPhoneNumber(registrationDto.getPhoneNumber())
+                .setSurname(registrationDto.getSurname());
 
-        user.setPassword(requestDto.getPassword())
-                .setUsername(requestDto.getUsername())
-                .setEmail(requestDto.getEmail())
+        user.setPassword(registrationDto.getPassword())
+                .setUsername(registrationDto.getUsername())
+                .setEmail(registrationDto.getEmail())
                 .setProfile(profile);
 
         userService.register(user);
     }
-
 
 
     @Test
@@ -109,9 +116,6 @@ class ProfileControllerTest {
         profile = profileRepository.findById(1L).orElse(null);
         String newName = profile.getName();
         assertEquals("NewName", newName);
-
-        profile.setName("asd");
-        profileRepository.save(profile);
     }
 
     @Test
@@ -120,7 +124,7 @@ class ProfileControllerTest {
 
         RateDto rateDto = new RateDto();
         rateDto.setRate(2.5d);
-        rateDto.setProfileId(1L);
+        rateDto.setProfileId(2L);
 
         mockMvc.perform(put("/profiles/rate")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -128,13 +132,14 @@ class ProfileControllerTest {
                 .content(objectMapper.writeValueAsString(rateDto)))
                 .andExpect(status().isOk());
 
-        Profile profile = profileRepository.findById(1L).orElse(null);
-        Double ratingValue = profile.getRatingValue();
+        Profile profileSender = profileRepository.getById(1L);
+        Profile profileRecipient = profileRepository.getById(2L);
 
-        assertNotNull(profile);
-        assertEquals(2.5d, ratingValue);
+        Rating rating = ratingRepository.getRatingByProfileSenderAndProfileRecipient(profileSender, profileRecipient);
 
-        ratingRepository.deleteAll();
+        assertNotNull(rating);
+        assertEquals(2.5d, rating.getRating());
+
     }
 
     @Test

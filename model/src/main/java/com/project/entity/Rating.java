@@ -19,7 +19,7 @@ public class Rating {
     @Column(name = "rating")
     private Double rating;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id_recipient")
     private Profile profileRecipient;
 

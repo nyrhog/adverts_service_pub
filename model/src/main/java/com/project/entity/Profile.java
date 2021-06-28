@@ -45,20 +45,21 @@ public class Profile {
     @Column(name = "update_date")
     private LocalDateTime updated;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "profile_id")
     private List<Advert> adverts = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "profile",
-            cascade = {CascadeType.REMOVE, CascadeType.MERGE},
+            cascade = {CascadeType.REMOVE},
             orphanRemoval = true
     )
     private List<Message> messages = new ArrayList<>();
 
     @OneToMany(
+            fetch = FetchType.LAZY,
             mappedBy = "profile",
-            cascade = CascadeType.ALL,
+            cascade = {CascadeType.REMOVE},
             orphanRemoval = true
     )
     private List<Comment> comments = new ArrayList<>();
@@ -71,19 +72,7 @@ public class Profile {
     )
     private List<Chat> chats = new ArrayList<>();
 
-    @OneToOne(mappedBy = "profile")
+    @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
     private User user;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Profile profile = (Profile) o;
-        return Objects.equals(id, profile.id) && Objects.equals(name, profile.name) && Objects.equals(surname, profile.surname) && Objects.equals(phoneNumber, profile.phoneNumber) && Objects.equals(ratingValue, profile.ratingValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, surname, phoneNumber, ratingValue);
-    }
 }

@@ -1,6 +1,7 @@
 package com.project;
 
 import lombok.SneakyThrows;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -27,7 +28,7 @@ public class MailSender {
     }
 
     @SneakyThrows
-    public void send(String email, int code) {
+    public void send(String email, String text, String title) {
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
@@ -45,12 +46,10 @@ public class MailSender {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(from));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
-        message.setSubject("Restore password");
-
-        String msg = "This is restore code " + code;
+        message.setSubject(title);
 
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
-        mimeBodyPart.setContent(msg, "text/html");
+        mimeBodyPart.setContent(text, "text/html");
 
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(mimeBodyPart);

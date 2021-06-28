@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 
 
 @SpringBootApplication
-@PropertySource("classpath:value.properties")
+@PropertySource({"classpath:value.properties", "classpath:application-value.properties"})
 public class AdvertsServiceApplication {
 
 	public static void main(String[] args) {

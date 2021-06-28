@@ -13,9 +13,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -32,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Transactional
 class AdvertControllerTest {
 
     @Autowired
@@ -48,6 +51,7 @@ class AdvertControllerTest {
 
     private User user;
     private Category category;
+    private Advert advert;
 
     @Autowired
     public AdvertControllerTest(AdvertRepository advertRepository, ProfileRepository profileRepository, IUserService userService, CategoryRepository categoryRepository, CommentRepository commentRepository) {
@@ -59,6 +63,7 @@ class AdvertControllerTest {
     }
 
     @BeforeAll
+    @Rollback(value = false)
     private void initBefore() {
         RegistrationDto requestDto = new RegistrationDto();
         requestDto.setFirstName("asd");
@@ -83,15 +88,15 @@ class AdvertControllerTest {
         category = new Category();
         category.setCategoryName("asd");
 
+        advert = new Advert();
+        advert.setAdName("ad");
+        advert.setAdPrice(123d);
+        advert.setStatus(Status.ACTIVE);
+        advert.setProfile(profile);
+
         userService.register(user);
+        advertRepository.save(advert);
         categoryRepository.save(category);
-    }
-
-
-    @AfterEach
-    private void resetDb() {
-        advertRepository.deleteAll();
-        commentRepository.deleteAll();
     }
 
     @Test
@@ -103,15 +108,14 @@ class AdvertControllerTest {
         advertDto.setCategories(List.of("asd"));
         advertDto.setDescription("asdasdasd");
         advertDto.setAdPrice(123d);
-        advertDto.setProfileId(1L);
 
         mockMvc.perform(post("/adverts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(advertDto)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isCreated());
 
-        Advert advert = advertRepository.findAll().get(0);
+        Advert advert = advertRepository.findAll().get(1);
 
         assertNotNull(advert);
         assertEquals("adName", advert.getAdName());
@@ -121,12 +125,9 @@ class AdvertControllerTest {
     @WithMockUser(username = "nyrhog")
     void updateAdvert() throws Exception {
 
-        userService.register(user);
         categoryRepository.save(category);
 
-        saveAdvert();
-
-        Advert advert = advertRepository.findAll().get(0);
+        advert = advertRepository.findAll().get(0);
 
         UpdateAdvertDto advertDto = new UpdateAdvertDto();
         advertDto.setAdvertId(advert.getId());
@@ -149,18 +150,13 @@ class AdvertControllerTest {
     @WithMockUser(username = "nyrhog")
     void deleteAdvert() throws Exception {
 
-        Advert advert = saveAdvert();
-
-        DeleteAdvertDto advertDto = new DeleteAdvertDto();
-        advertDto.setAdvertId(advert.getId());
-        advertDto.setUsername("nyrhog");
+        Long id = advert.getId();
 
         assertEquals(1, advertRepository.findAll().size());
 
-        mockMvc.perform(delete("/adverts")
+        mockMvc.perform(delete("/adverts/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(advertDto)))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         assertEquals(0, advertRepository.findAll().size());
@@ -168,10 +164,9 @@ class AdvertControllerTest {
 
     @Test
     @WithMockUser(username = "nyrhog")
-    @Transactional
     void addComment() throws Exception {
 
-        Long id = saveAdvert().getId();
+        Long id = advert.getId();
 
         CommentaryDto commentaryDto = new CommentaryDto();
         commentaryDto.setAdvertId(id);
@@ -191,7 +186,6 @@ class AdvertControllerTest {
     }
 
     @Test
-    @Transactional
     @WithMockUser(username = "nyrhog")
     void updateComment() throws Exception {
         Profile profile = profileRepository.findAll().get(0);
@@ -202,7 +196,6 @@ class AdvertControllerTest {
         comment = commentRepository.save(comment);
 
         EditCommentDto dto = new EditCommentDto();
-        dto.setUsername("nyrhog");
         dto.setNewCommentText("newCommentText");
         dto.setCommentId(comment.getId());
 
@@ -219,7 +212,6 @@ class AdvertControllerTest {
     @WithMockUser(username = "nyrhog")
     void deleteComment() throws Exception {
 
-        Advert advert = saveAdvert();
         Profile profile = profileRepository.findAll().get(0);
 
         Comment comment = new Comment();
@@ -227,17 +219,10 @@ class AdvertControllerTest {
         comment.setAdvert(advert);
         comment.setProfile(profile);
 
-        profile.setComments(List.of(comment));
-        advert.setComments(List.of(comment));
-
-        assertEquals(0, commentRepository.findAll().size());
-
-        comment = commentRepository.save(comment);
-        profileRepository.save(profile);
-        advertRepository.save(advert);
-
+        commentRepository.save(comment);
         assertEquals(1, commentRepository.findAll().size());
-        mockMvc.perform(delete("/adverts/comment?username=nyrhog&id=" + comment.getId())
+
+        mockMvc.perform(delete("/adverts/comment?id=" + comment.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -248,7 +233,6 @@ class AdvertControllerTest {
     @Test
     @WithMockUser(username = "nyrhog")
     void getAdvert() throws Exception {
-        Advert advert = saveAdvert();
 
         mockMvc.perform(get("/adverts/" + advert.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -260,15 +244,4 @@ class AdvertControllerTest {
 
     }
 
-    private Advert saveAdvert() {
-        Profile profile = profileRepository.findAll().get(0);
-
-        Advert advert = new Advert();
-        advert.setAdName("ad");
-        advert.setAdPrice(123d);
-        advert.setStatus(Status.ACTIVE);
-        advert.setProfile(profile);
-
-        return advertRepository.save(advert);
-    }
 }

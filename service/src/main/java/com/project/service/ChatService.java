@@ -20,7 +20,6 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class ChatService implements IChatService {
 
     private final ProfileRepository profileRepository;
@@ -106,7 +105,6 @@ public class ChatService implements IChatService {
         log.info("Message was edited");
     }
 
-    @Transactional
     @Override
     public void deleteMessage(Long id) {
 

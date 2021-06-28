@@ -20,10 +20,10 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String categoryName;
 
-    @OneToMany(mappedBy = "mainCategory")
+    @OneToMany(mappedBy = "mainCategory", fetch = FetchType.LAZY)
     private List<Category> categories;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category mainCategory;
 

@@ -11,6 +11,7 @@ import com.project.jwt.JwtTokenProvider;
 import com.project.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 
@@ -62,7 +63,7 @@ public class AuthController {
 
 
         userService.register(user);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/restore-password")

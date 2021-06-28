@@ -7,6 +7,7 @@ import com.project.service.IAdvertService;
 import com.project.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,7 +15,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-public class AdminController {
+public class AdminController{
 
     private final IUserService userService;
     private final IAdvertService advertService;

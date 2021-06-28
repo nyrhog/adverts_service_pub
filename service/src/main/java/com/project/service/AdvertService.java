@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class AdvertService implements IAdvertService {
 
     private final ProfileRepository profileRepository;
@@ -54,6 +53,7 @@ public class AdvertService implements IAdvertService {
     private static final String COMMENTARY_NOT_FOUND = "Commentary with id: %s not found";
 
     @Override
+    @Transactional
     public void createAdvert(CreateAdvertDto advertDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -84,6 +84,7 @@ public class AdvertService implements IAdvertService {
 
 
     @Override
+    @Transactional
     public void updateAdvert(UpdateAdvertDto advertDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -133,6 +134,7 @@ public class AdvertService implements IAdvertService {
     }
 
     @Override
+    @Transactional
     public void closeAdvert(Long id) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -155,6 +157,7 @@ public class AdvertService implements IAdvertService {
     }
 
     @Override
+    @Transactional
     public void enablePremiumStatus(Long advertId) {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
@@ -192,8 +195,7 @@ public class AdvertService implements IAdvertService {
         comment.setAdvert(advert);
         comment.setProfile(sender);
 
-        sender.getComments().add(comment);
-        advert.getComments().add(comment);
+        commentRepository.save(comment);
 
         log.info("Commentary was added");
     }
@@ -221,6 +223,7 @@ public class AdvertService implements IAdvertService {
         log.info("Commentary was deleted");
     }
 
+    @Transactional
     public void editComment(EditCommentDto editCommentDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
@@ -277,7 +280,7 @@ public class AdvertService implements IAdvertService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void disableExpiredPrems() {
         List<AdvertPremium> expiredPrems = advertPremiumRepository.getAllByPremEndLessThanAndIsActiveTrue(LocalDateTime.now());
 
@@ -311,10 +314,13 @@ public class AdvertService implements IAdvertService {
         AdvertDto advertDto = advertMapper.toAdvertDto(advert);
 
         log.info("Advert was got with id: " + advertId);
+
+
         return advertDto;
     }
 
     @Override
+    @Transactional
     public BillingDetailsDto getBillingDetails(Long advertId, Integer days) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();

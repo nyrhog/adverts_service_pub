@@ -44,11 +44,14 @@ public class Advert {
     @Column(name = "close_date")
     private LocalDateTime closed;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "advert_premium_id", referencedColumnName = "id")
     private AdvertPremium advertPremium;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST})
+    @ManyToMany(
+            cascade = {CascadeType.PERSIST},
+            fetch = FetchType.LAZY
+    )
     @JoinTable(
             name = "adverts_categories",
             joinColumns = {@JoinColumn(name = "adverts_id")},
@@ -57,16 +60,17 @@ public class Advert {
     private List<Category> categories;
 
     @OneToMany(
+            fetch = FetchType.LAZY,
             mappedBy = "advert",
-            cascade = {CascadeType.REMOVE, CascadeType.MERGE},
+            cascade = {CascadeType.REMOVE},
             orphanRemoval = true
     )
     private List<Comment> comments = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
-    @OneToOne(mappedBy = "advert", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "advert", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private BillingDetails billingDetails;
 }

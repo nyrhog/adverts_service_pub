@@ -21,6 +21,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
+@Transactional
 class AdminControllerTest {
 
     @Autowired
@@ -53,12 +55,6 @@ class AdminControllerTest {
         this.advertRepository = advertRepository;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
-    }
-
-    @AfterEach
-    private void resetDb() {
-        userRepository.deleteAll();
-        roleRepository.deleteAll();
     }
 
     @Test
@@ -89,5 +85,30 @@ class AdminControllerTest {
         assertTrue(user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")));
     }
 
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "ADMIN")
+    void enablePremStatus() throws Exception {
 
+        AdvertPremium advertPremium = new AdvertPremium();
+
+        Advert advert = new Advert();
+        advert.setAdName("ad");
+        advert.setAdPrice(123d);
+        advert.setStatus(Status.ACTIVE);
+        advert.setAdvertPremium(advertPremium);
+
+        BillingDetails billingDetails = new BillingDetails();
+        billingDetails.setDays(4);
+        advert.setBillingDetails(billingDetails);
+
+        advert = advertRepository.save(advert);
+        mockMvc.perform(patch("/admin/premium/" + advert.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        advert = advertRepository.getById(advert.getId());
+        assertTrue(advert.getAdvertPremium().getIsActive());
+
+    }
 }

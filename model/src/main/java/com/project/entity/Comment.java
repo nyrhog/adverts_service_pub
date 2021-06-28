@@ -1,6 +1,5 @@
 package com.project.entity;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Getter
 @Setter
-@EqualsAndHashCode
 public class Comment {
 
     @Id
