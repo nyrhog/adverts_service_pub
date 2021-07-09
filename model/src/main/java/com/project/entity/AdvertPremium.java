@@ -1,8 +1,10 @@
 package com.project.entity;
 
+import com.project.support.BooleanToStringConverter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ public class AdvertPremium {
     private Long id;
 
     @Column(name = "is_active", nullable = false)
+    @Convert(converter= BooleanToStringConverter.class)
     private Boolean isActive;
 
     @Column(name = "premium_started")

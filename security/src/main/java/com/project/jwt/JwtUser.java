@@ -34,38 +34,21 @@ public class JwtUser implements UserDetails {
         return password;
     }
 
-    @JsonIgnore
-    public Long getId() {
-        return id;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    @JsonIgnore
     @Override
     public String getUsername() {
         return nickname;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;

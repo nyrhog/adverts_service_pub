@@ -1,6 +1,7 @@
 package com.project.controller;
 
 
+import com.project.Logging;
 import com.project.dto.AuthenticationRequestDto;
 import com.project.dto.RegistrationDto;
 import com.project.dto.ResponseDto;
@@ -10,7 +11,6 @@ import com.project.entity.User;
 import com.project.jwt.JwtTokenProvider;
 import com.project.service.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.net.URI;
 
 @RestController
 @RequestMapping(value = "/auth")
@@ -70,7 +69,7 @@ public class AuthController {
     public ResponseEntity<Void> sendMessage(@RequestParam String username){
 
         userService.sendMessageWithCode(username);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/restore-password")
@@ -82,7 +81,7 @@ public class AuthController {
 
         userService.restorePassword(username, code, newPassword);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
 }

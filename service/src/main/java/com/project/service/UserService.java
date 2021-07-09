@@ -1,6 +1,7 @@
 package com.project.service;
 
 import com.project.CodeGenerator;
+import com.project.Logging;
 import com.project.MailSender;
 import com.project.dao.RoleRepository;
 import com.project.dao.UserRepository;
@@ -38,6 +39,7 @@ public class UserService implements IUserService {
     private String messageTitle;
 
     @Override
+    @Logging
     public User register(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
@@ -53,6 +55,7 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
+    @Logging
     public User registerAdminUser(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         Role adminRoleUser = roleRepository.findByName("ROLE_ADMIN");
@@ -65,6 +68,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Logging
     public void sendMessageWithCode(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User with username: " + username + " not found"));

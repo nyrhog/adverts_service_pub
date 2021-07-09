@@ -1,5 +1,6 @@
 package com.project.service;
 
+import com.project.Logging;
 import com.project.dao.ProfileRepository;
 import com.project.dao.RatingRepository;
 import com.project.dto.ProfileDto;
@@ -31,7 +32,8 @@ public class ProfileService implements IProfileService {
 
     @Transactional
     @Override
-    public void updateProfile(ProfileUpdateDto updateDto) {
+    @Logging
+    public Profile updateProfile(ProfileUpdateDto updateDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -45,13 +47,14 @@ public class ProfileService implements IProfileService {
 
         mapper.updateProfile(profile, updateDto);
         profile.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
+        return profile;
 
-        log.info("Profile with id:{} was updated", profile.getId());
     }
 
     @Transactional
     @Override
-    public void rateProfile(RateDto rateDto) {
+    @Logging
+    public Rating rateProfile(RateDto rateDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -78,16 +81,16 @@ public class ProfileService implements IProfileService {
 
         ratingRepository.save(rating);
         log.info("Profile with id:{} was rated with rate:{}", profileRecipient.getId(), rateDto.getRate());
+
+        return rating;
     }
 
     @Override
+    @Logging
     public ProfileDto getProfile(Long id) {
         Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, id)));
 
-        ProfileDto dto = mapper.toProfileDto(profile);
-
-        log.info("Get profile with id:{}", id);
-        return dto;
+        return mapper.toProfileDto(profile);
     }
 }

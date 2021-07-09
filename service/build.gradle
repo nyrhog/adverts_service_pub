@@ -1,5 +1,7 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
 }
 
 def mapstructVersion = '1.4.2.Final'
@@ -9,6 +11,15 @@ version '0.0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+
 }
 
 

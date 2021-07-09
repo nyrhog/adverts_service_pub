@@ -1,5 +1,6 @@
 package com.project.controller;
 
+import com.project.Logging;
 import com.project.dto.*;
 import com.project.service.IAdvertService;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +37,12 @@ public class AdvertController {
         return ResponseEntity.ok().build();
     }
 
-
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAdvert(@PathVariable Long id) {
 
         advertService.deleteAdvert(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/close/{id}")
@@ -71,7 +71,7 @@ public class AdvertController {
     public ResponseEntity<Void> deleteComment(@RequestParam Long id) {
 
         advertService.deleteComment(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

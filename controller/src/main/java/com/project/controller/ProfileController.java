@@ -1,10 +1,12 @@
 package com.project.controller;
 
+import com.project.Logging;
 import com.project.dto.ProfileDto;
 import com.project.dto.ProfileUpdateDto;
 import com.project.dto.RateDto;
 import com.project.service.IProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +33,7 @@ public class ProfileController {
     public ResponseEntity<Void> rateProfile(@Valid @RequestBody RateDto rateDto) {
 
         profileService.rateProfile(rateDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

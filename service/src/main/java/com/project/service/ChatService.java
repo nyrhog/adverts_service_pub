@@ -1,5 +1,6 @@
 package com.project.service;
 
+import com.project.Logging;
 import com.project.dao.ChatRepository;
 import com.project.dao.MessageRepository;
 import com.project.dao.ProfileRepository;
@@ -31,7 +32,8 @@ public class ChatService implements IChatService {
 
     @Transactional
     @Override
-    public void createChat(CreateChatDto createChatDto) {
+    @Logging
+    public Chat createChat(CreateChatDto createChatDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -43,21 +45,19 @@ public class ChatService implements IChatService {
 
         if (isChatExist(chatCreator, recipient)) {
             log.info("Chat between {} and {} is exist", chatCreator.getName(), recipient.getName());
-            return;
+            return null;
         }
 
         Chat chat = new Chat();
         chat.setProfiles(List.of(chatCreator, recipient));
 
-        chatCreator.getChats().add(chat);
-        recipient.getChats().add(chat);
-
-        log.info("Chat was created");
+        return chat;
     }
 
     @Transactional
     @Override
-    public void sendMessage(SendMessageDto messageDto) {
+    @Logging
+    public Message sendMessage(SendMessageDto messageDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Profile messageSender = profileRepository.getProfileByUserUsername(currentPrincipalName)
@@ -75,6 +75,8 @@ public class ChatService implements IChatService {
         message.setProfile(messageSender);
 
         log.info("Message was send");
+
+        return message;
     }
 
     protected boolean isChatExist(Profile creator, Profile recipient) {
@@ -84,7 +86,8 @@ public class ChatService implements IChatService {
 
     @Transactional
     @Override
-    public void updateMessage(UpdateMessageDto updateMessageDto) {
+    @Logging
+    public Message updateMessage(UpdateMessageDto updateMessageDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Message message = messageRepository.findById(updateMessageDto.getMessageId())
@@ -97,15 +100,16 @@ public class ChatService implements IChatService {
         }
 
         if (message.getText().equals(updateMessageDto.getNewText())) {
-            return;
+            return null;
         }
 
         message.setText(updateMessageDto.getNewText());
+        return message;
 
-        log.info("Message was edited");
     }
 
     @Override
+    @Logging
     public void deleteMessage(Long id) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
@@ -120,11 +124,11 @@ public class ChatService implements IChatService {
         }
 
         messageRepository.delete(message);
-        log.info("Message was deleted");
     }
 
     @Transactional
     @Override
+    @Logging
     public ChatDto getChat(Long id) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
@@ -137,10 +141,7 @@ public class ChatService implements IChatService {
         boolean contains = profile.getChats().contains(chat);
 
         if (contains){
-            ChatDto chatDto = mapper.chatToChatDto(chat);
-
-            log.info("Chat was got");
-            return chatDto;
+            return mapper.chatToChatDto(chat);
         }
 
         throw new EntityNotFoundException("This profile doesn't have current chat");

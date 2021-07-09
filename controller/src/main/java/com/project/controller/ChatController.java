@@ -1,8 +1,10 @@
 package com.project.controller;
 
+import com.project.Logging;
 import com.project.dto.*;
 import com.project.service.IChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,7 @@ public class ChatController {
     public ResponseEntity<Void> createChat(@RequestBody @Valid CreateChatDto createChatDto){
 
         chatService.createChat(createChatDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/message")
@@ -47,7 +49,7 @@ public class ChatController {
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id){
 
         chatService.deleteMessage(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

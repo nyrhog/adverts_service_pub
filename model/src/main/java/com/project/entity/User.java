@@ -29,6 +29,7 @@ public class User {
     private String email;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserStatus status;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

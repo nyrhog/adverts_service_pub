@@ -17,6 +17,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,16 +111,16 @@ class AdvertControllerTest {
         advertDto.setDescription("asdasdasd");
         advertDto.setAdPrice(123d);
 
-        mockMvc.perform(post("/adverts")
+        mockMvc.perform(MockMvcRequestBuilders.post("/adverts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(advertDto)))
-                .andExpect(status().isCreated());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         Advert advert = advertRepository.findAll().get(1);
 
-        assertNotNull(advert);
-        assertEquals("adName", advert.getAdName());
+        Assertions.assertNotNull(advert);
+        Assertions.assertEquals("adName", advert.getAdName());
     }
 
     @Test
@@ -134,16 +136,16 @@ class AdvertControllerTest {
         advertDto.setUsername("nyrhog");
         advertDto.setAdName("newAdName");
 
-        mockMvc.perform(patch("/adverts")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/adverts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(advertDto)))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         advert = advertRepository.findById(advert.getId()).orElse(null);
 
-        assertNotNull(advert);
-        assertEquals("newAdName", advert.getAdName());
+        Assertions.assertNotNull(advert);
+        Assertions.assertEquals("newAdName", advert.getAdName());
     }
 
     @Test
@@ -152,14 +154,14 @@ class AdvertControllerTest {
 
         Long id = advert.getId();
 
-        assertEquals(1, advertRepository.findAll().size());
+        Assertions.assertEquals(1, advertRepository.findAll().size());
 
-        mockMvc.perform(delete("/adverts/" + id)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/adverts/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        assertEquals(0, advertRepository.findAll().size());
+        Assertions.assertEquals(0, advertRepository.findAll().size());
     }
 
     @Test
@@ -172,17 +174,17 @@ class AdvertControllerTest {
         commentaryDto.setAdvertId(id);
         commentaryDto.setCommentaryMessage("Some comment");
 
-        mockMvc.perform(post("/adverts/comment")
+        mockMvc.perform(MockMvcRequestBuilders.post("/adverts/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(commentaryDto)))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         Advert advert = advertRepository.findById(id).orElse(null);
         List<Comment> all = commentRepository.findAll();
-        assertEquals(1, all.size());
-        assertNotNull(advert);
-        assertEquals("Some comment", advert.getComments().get(0).getCommentText());
+        Assertions.assertEquals(1, all.size());
+        Assertions.assertNotNull(advert);
+        Assertions.assertEquals("Some comment", advert.getComments().get(0).getCommentText());
     }
 
     @Test
@@ -199,13 +201,13 @@ class AdvertControllerTest {
         dto.setNewCommentText("newCommentText");
         dto.setCommentId(comment.getId());
 
-        mockMvc.perform(patch("/adverts/comment")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/adverts/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        assertEquals("newCommentText", comment.getCommentText());
+        Assertions.assertEquals("newCommentText", comment.getCommentText());
     }
 
     @Test
@@ -220,27 +222,27 @@ class AdvertControllerTest {
         comment.setProfile(profile);
 
         commentRepository.save(comment);
-        assertEquals(1, commentRepository.findAll().size());
+        Assertions.assertEquals(1, commentRepository.findAll().size());
 
-        mockMvc.perform(delete("/adverts/comment?id=" + comment.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/adverts/comment?id=" + comment.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        assertEquals(0, commentRepository.findAll().size());
+        Assertions.assertEquals(0, commentRepository.findAll().size());
     }
 
     @Test
     @WithMockUser(username = "nyrhog")
     void getAdvert() throws Exception {
 
-        mockMvc.perform(get("/adverts/" + advert.getId())
+        mockMvc.perform(MockMvcRequestBuilders.get("/adverts/" + advert.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(advert.getId()))
-                .andExpect(jsonPath("$.adName").value("ad"))
-                .andExpect(jsonPath("$.adPrice").value(123d));
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(advert.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.adName").value("ad"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.adPrice").value(123d));
 
     }
 

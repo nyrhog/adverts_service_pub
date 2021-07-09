@@ -22,11 +22,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -146,14 +147,14 @@ class ProfileControllerTest {
     @WithMockUser(username = "nyrhog")
     void getProfile() throws Exception {
 
-        mockMvc.perform(get("/profiles/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/profiles/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("asd"))
-                .andExpect(jsonPath("$.surname").value("asd"))
-                .andExpect(jsonPath("$.phoneNumber").value("123123123"));
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("asd"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.surname").value("asd"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value("123123123"));
 
     }
 }

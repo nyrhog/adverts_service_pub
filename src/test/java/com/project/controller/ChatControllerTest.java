@@ -12,6 +12,7 @@ import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.service.IChatService;
 import com.project.service.IUserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,6 +26,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -95,14 +98,14 @@ class ChatControllerTest {
         createChatDto.setChatCreateProfileId(1L);
         createChatDto.setChatWithProfileId(2L);
 
-        mockMvc.perform(post("/chats")
+        mockMvc.perform(MockMvcRequestBuilders.post("/chats")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createChatDto)))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         Chat chat = chatRepository.getChatByProfilesIdIn(1L, 2L);
-        assertNotNull(chat);
+        Assertions.assertNotNull(chat);
     }
 
     @Test
@@ -115,16 +118,16 @@ class ChatControllerTest {
 
         createTestChat();
 
-        mockMvc.perform(put("/chats/message")
+        mockMvc.perform(MockMvcRequestBuilders.put("/chats/message")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sendMessageDto)))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         List<Message> messages = messageRepository.findAll();
 
-        assertEquals(1, messages.size());
-        assertEquals("Message", messages.get(0).getText());
+        Assertions.assertEquals(1, messages.size());
+        Assertions.assertEquals("Message", messages.get(0).getText());
     }
 
     @Test
@@ -133,10 +136,10 @@ class ChatControllerTest {
 
         createTestChat();
 
-        mockMvc.perform(get("/chats/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/chats/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     void registerUser(RegistrationDto requestDto) {

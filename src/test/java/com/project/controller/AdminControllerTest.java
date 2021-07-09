@@ -1,6 +1,5 @@
 package com.project.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.AdvertsServiceApplication;
 import com.project.dao.AdvertRepository;
@@ -8,10 +7,7 @@ import com.project.dao.RoleRepository;
 import com.project.dao.UserRepository;
 import com.project.dto.RegistrationDto;
 import com.project.entity.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +17,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -43,9 +41,9 @@ class AdminControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private AdvertRepository advertRepository;
-    private RoleRepository roleRepository;
-    private UserRepository userRepository;
+    private final AdvertRepository advertRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -73,16 +71,16 @@ class AdminControllerTest {
 
         roleRepository.save(roleAdmin);
 
-        mockMvc.perform(post("/admin/registration")
+        mockMvc.perform(MockMvcRequestBuilders.post("/admin/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registrationDto)))
-                .andExpect(status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         User user = userRepository.findByUsername("nyrhog").orElse(null);
 
-        assertNotNull(user);
-        assertTrue(user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")));
+        Assertions.assertNotNull(user);
+        Assertions.assertTrue(user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")));
     }
 
     @Test
@@ -102,13 +100,13 @@ class AdminControllerTest {
         advert.setBillingDetails(billingDetails);
 
         advert = advertRepository.save(advert);
-        mockMvc.perform(patch("/admin/premium/" + advert.getId())
+        mockMvc.perform(MockMvcRequestBuilders.patch("/admin/premium/" + advert.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         advert = advertRepository.getById(advert.getId());
-        assertTrue(advert.getAdvertPremium().getIsActive());
+        Assertions.assertTrue(advert.getAdvertPremium().getIsActive());
 
     }
 }

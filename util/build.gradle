@@ -1,5 +1,7 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
 }
 
 group 'com.project'
@@ -9,7 +11,21 @@ repositories {
     mavenCentral()
 }
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+
+}
+
+
 dependencies {
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: '2.5.1'
+
+
     implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
-    compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.12.RELEASE'
+    api group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.12.RELEASE'
 }

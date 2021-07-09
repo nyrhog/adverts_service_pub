@@ -10,10 +10,7 @@ import com.project.dto.RestorePasswordDto;
 import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.service.IUserService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,6 +20,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -80,12 +79,12 @@ class AuthControllerTest {
         authenticationRequestDto.setUsername("nyrhog");
         authenticationRequestDto.setPassword("test");
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(authenticationRequestDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("nyrhog"));
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("nyrhog"));
 
     }
 
@@ -100,28 +99,28 @@ class AuthControllerTest {
         registrationDto.setSurname("Kananovich");
         registrationDto.setPhoneNumber("335553535");
 
-        mockMvc.perform(post("/auth/registration")
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registrationDto)))
-                .andExpect(status().isCreated());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         List<User> all = userRepository.findAll();
-        assertEquals("nyrhog", all.get(0).getUsername());
+        Assertions.assertEquals("nyrhog", all.get(0).getUsername());
     }
 
     @Test
     void sendMessage() throws Exception {
 
-        mockMvc.perform(put("/auth/restore-password?username=nyrhog")
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/restore-password?username=nyrhog")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         User user = userRepository.findByUsername("nyrhog").orElse(null);
 
-        assertNotNull(user);
-        assertNotNull(user.getGeneratedValue());
+        Assertions.assertNotNull(user);
+        Assertions.assertNotNull(user.getGeneratedValue());
     }
 
     @Test
@@ -135,15 +134,15 @@ class AuthControllerTest {
         restorePasswordDto.setUsername(user.getUsername());
         restorePasswordDto.setNewPassword("asdasdasd");
 
-        mockMvc.perform(patch("/auth/restore-password")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/auth/restore-password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restorePasswordDto)))
-                .andExpect(status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         user = userRepository.findByUsername("nyrhog").orElse(null);
 
-        assertNull(user.getGeneratedValue());
+        Assertions.assertNull(user.getGeneratedValue());
     }
 
 

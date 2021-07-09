@@ -1,6 +1,7 @@
 package com.project.service;
 
 
+import com.project.Logging;
 import com.project.dao.*;
 import com.project.dto.*;
 import com.project.entity.*;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
@@ -54,7 +54,8 @@ public class AdvertService implements IAdvertService {
 
     @Override
     @Transactional
-    public void createAdvert(CreateAdvertDto advertDto) {
+    @Logging
+    public Advert createAdvert(CreateAdvertDto advertDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
@@ -75,17 +76,18 @@ public class AdvertService implements IAdvertService {
 
         categories.forEach(category -> category.getAdverts().add(advert));
 
-        advertsRepository.save(advert);
 
+        Advert savedAdvert = advertsRepository.save(advert);
         profile.getAdverts().add(advert);
 
-        log.info("Advert was created");
+        return savedAdvert;
     }
 
 
     @Override
     @Transactional
-    public void updateAdvert(UpdateAdvertDto advertDto) {
+    @Logging
+    public Advert updateAdvert(UpdateAdvertDto advertDto) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
@@ -107,12 +109,13 @@ public class AdvertService implements IAdvertService {
 
         advert.setUpdated(LocalDateTime.now(ZoneId.of("Europe/Minsk")));
 
-        log.info("Advert was updated");
+        return advert;
     }
 
+    @Logging
     @Override
+    @Transactional
     public void deleteAdvert(Long id) {
-
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Profile profile = profileRepository.getProfileByUserUsername(currentPrincipalName)
@@ -129,23 +132,24 @@ public class AdvertService implements IAdvertService {
         }
 
         advertsRepository.delete(advert);
-
-        log.info("Advert was deleted");
     }
 
     @Override
     @Transactional
-    public void closeAdvert(Long id) {
+    @Logging
+    public Advert closeAdvert(Long id) {
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
         Advert advert = advertsRepository.getAdvertByIdAndProfile_User_Username(id, currentPrincipalName)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, id)));
 
         advert.setStatus(Status.CLOSED);
-        log.info("Advert was closed");
+
+        return advert;
     }
 
     @Override
+    @Logging
     public List<AdvertDto> getProfileActiveAdverts(Long profileId) {
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(PROFILE_NOT_FOUND, profileId)));
@@ -158,7 +162,8 @@ public class AdvertService implements IAdvertService {
 
     @Override
     @Transactional
-    public void enablePremiumStatus(Long advertId) {
+    @Logging
+    public AdvertPremium enablePremiumStatus(Long advertId) {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
 
@@ -174,11 +179,14 @@ public class AdvertService implements IAdvertService {
                 .setPremEnd(LocalDateTime.now().plusDays(premDays));
 
         billingDetailsRepository.delete(advert.getBillingDetails());
-        log.info("Premium status was enabled to advert with id: " + advertId);
+
+        return advert.getAdvertPremium();
     }
 
     @Override
-    public void addCommentaryToAdvert(CommentaryDto commentaryDto) {
+    @Logging
+    @Transactional
+    public Comment addCommentaryToAdvert(CommentaryDto commentaryDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -197,9 +205,11 @@ public class AdvertService implements IAdvertService {
 
         commentRepository.save(comment);
 
-        log.info("Commentary was added");
+        return comment;
     }
 
+    @Logging
+    @Transactional
     public void deleteComment(Long commentId) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
@@ -219,12 +229,11 @@ public class AdvertService implements IAdvertService {
         }
 
         commentRepository.delete(comment);
-
-        log.info("Commentary was deleted");
     }
 
     @Transactional
-    public void editComment(EditCommentDto editCommentDto) {
+    @Logging
+    public Comment editComment(EditCommentDto editCommentDto) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();
 
@@ -244,9 +253,10 @@ public class AdvertService implements IAdvertService {
 
         comment.setCommentText(editCommentDto.getNewCommentText());
 
-        log.info("Commentary was edited");
+        return comment;
     }
 
+    @Logging
     public Page<AdvertDto> getAdverts(AdvertListDto advertDto) {
 
         advertService.disableExpiredPrems();
@@ -255,9 +265,9 @@ public class AdvertService implements IAdvertService {
         Integer pageSize = advertDto.getPageSize();
         String search = advertDto.getSearch();
 
-        List<String> replacedCategories = replaceCharsInCategories(advertDto.getCategories());
+//        List<String> replacedCategories = replaceCharsInCategories(advertDto.getCategories());
 
-        List<Category> categories = categoryRepository.findByCategoryNameIn(replacedCategories);
+        List<Category> categories = categoryRepository.findByCategoryNameIn(advertDto.getCategories());
         List<String> categoriesNames = categories.stream()
                 .map(Category::getCategoryName)
                 .collect(Collectors.toList());
@@ -270,7 +280,6 @@ public class AdvertService implements IAdvertService {
                 .map((advertMapper::toAdvertDto))
                 .collect(Collectors.toList());
 
-        log.info("Adverts was taken");
         return new PageImpl<>(advertDtoList, PageRequest.of(pageNumber, pageSize), adverts.getTotalElements());
     }
 
@@ -281,6 +290,7 @@ public class AdvertService implements IAdvertService {
     }
 
     @Transactional
+    @Logging
     public void disableExpiredPrems() {
         List<AdvertPremium> expiredPrems = advertPremiumRepository.getAllByPremEndLessThanAndIsActiveTrue(LocalDateTime.now());
 
@@ -293,6 +303,7 @@ public class AdvertService implements IAdvertService {
     }
 
     @Override
+    @Logging
     public Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size) {
 
         Page<Advert> advertList = advertsRepository.getAllClosedAdvertsWithProfileId(profileId,
@@ -302,25 +313,21 @@ public class AdvertService implements IAdvertService {
                 .map(advertMapper::toAdvertDto)
                 .collect(Collectors.toList());
 
-        log.info("Selling history was taking");
         return new PageImpl<>(advertListDto, PageRequest.of(page, size), advertList.getTotalElements());
     }
 
     @Override
+    @Logging
     public AdvertDto getOneAdvert(Long advertId) {
         Advert advert = advertsRepository.findById(advertId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(ADVERT_NOT_FOUND, advertId)));
 
-        AdvertDto advertDto = advertMapper.toAdvertDto(advert);
-
-        log.info("Advert was got with id: " + advertId);
-
-
-        return advertDto;
+        return advertMapper.toAdvertDto(advert);
     }
 
     @Override
     @Transactional
+    @Logging
     public BillingDetailsDto getBillingDetails(Long advertId, Integer days) {
 
         String currentPrincipalName = UtilServiceClass.getCurrentPrincipalName();

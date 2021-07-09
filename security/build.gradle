@@ -1,5 +1,7 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
 }
 
 group 'com.project'
@@ -7,6 +9,15 @@ version '0.0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+
 }
 
 dependencies {

@@ -6,6 +6,7 @@ import com.project.entity.User;
 import com.project.service.IAdvertService;
 import com.project.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class AdminController{
 
         userService.registerAdminUser(user);
 
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping("/premium/{id}")

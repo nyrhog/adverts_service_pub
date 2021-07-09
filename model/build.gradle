@@ -1,5 +1,7 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
 }
 
 group 'com.project'
@@ -9,12 +11,20 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-//    compile group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springBootVers}"
+bootJar {
+    enabled = false
+}
 
-    compileOnly group: 'org.hibernate', name: 'hibernate-jpamodelgen', version: '5.4.31.Final'
+jar {
+    enabled = true
+
+}
+dependencies {
+
+    api group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
+    api group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: "${springBootVers}"
+
+    api group: 'org.hibernate', name: 'hibernate-jpamodelgen', version: '5.4.31.Final'
     annotationProcessor('org.hibernate:hibernate-jpamodelgen:5.4.31.Final')
 
 }
