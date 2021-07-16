@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface MessageMapper {
 
+    @Mapping(target = "creatorProfileId", source = "message.profile.id")
     MessageDto toMessageDto(Message message);
 
 }

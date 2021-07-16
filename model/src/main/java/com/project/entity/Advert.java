@@ -1,9 +1,11 @@
 package com.project.entity;
 
+import com.project.enums.Status;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,11 +16,12 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
+@EqualsAndHashCode(of = "id")
+@ToString
 public class Advert {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "adverts_seq")
-    @SequenceGenerator(name = "adverts_seq", sequenceName = "SEQ_ADVERTS", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "ad_name", nullable = false)
@@ -46,6 +49,7 @@ public class Advert {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "advert_premium_id", referencedColumnName = "id")
+    @ToString.Exclude
     private AdvertPremium advertPremium;
 
     @ManyToMany(
@@ -57,6 +61,7 @@ public class Advert {
             joinColumns = {@JoinColumn(name = "adverts_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")}
     )
+    @ToString.Exclude
     private List<Category> categories;
 
     @OneToMany(
@@ -65,12 +70,16 @@ public class Advert {
             cascade = {CascadeType.REMOVE},
             orphanRemoval = true
     )
+    @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
+    @ToString.Exclude
     private Profile profile;
 
     @OneToOne(mappedBy = "advert", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private BillingDetails billingDetails;
+
 }

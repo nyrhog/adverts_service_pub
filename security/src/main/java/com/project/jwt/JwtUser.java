@@ -1,8 +1,6 @@
 package com.project.jwt;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.entity.Status;
-import com.project.entity.UserStatus;
+import com.project.enums.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;

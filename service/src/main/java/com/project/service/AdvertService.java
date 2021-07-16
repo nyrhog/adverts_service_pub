@@ -5,8 +5,10 @@ import com.project.Logging;
 import com.project.dao.*;
 import com.project.dto.*;
 import com.project.entity.*;
+import com.project.enums.Status;
 import com.project.mapper.AdvertMapper;
 import com.project.mapper.BillingDetailsMapper;
+import com.project.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,7 @@ public class AdvertService implements IAdvertService {
     private final BillingDetailsRepository billingDetailsRepository;
     private final BillingDetailsMapper billingDetailsMapper;
     private final AdvertMapper advertMapper;
+    private final CommentMapper commentMapper;
 
     @Autowired
     private AdvertService advertService;
@@ -72,15 +75,13 @@ public class AdvertService implements IAdvertService {
                 .setDescription(advertDto.getDescription())
                 .setAdvertPremium(advertPremium)
                 .setCategories(categories)
-                .setStatus(Status.ACTIVE);
+                .setStatus(Status.ACTIVE)
+                .setProfile(profile);
 
         categories.forEach(category -> category.getAdverts().add(advert));
 
 
-        Advert savedAdvert = advertsRepository.save(advert);
-        profile.getAdverts().add(advert);
-
-        return savedAdvert;
+        return advertsRepository.save(advert);
     }
 
 
@@ -184,6 +185,13 @@ public class AdvertService implements IAdvertService {
     }
 
     @Override
+    public CommentDto getComment(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format(COMMENTARY_NOT_FOUND, id))) ;
+        return commentMapper.commentToCommentDto(comment);
+    }
+
+    @Override
     @Logging
     @Transactional
     public Comment addCommentaryToAdvert(CommentaryDto commentaryDto) {
@@ -265,8 +273,6 @@ public class AdvertService implements IAdvertService {
         Integer pageSize = advertDto.getPageSize();
         String search = advertDto.getSearch();
 
-//        List<String> replacedCategories = replaceCharsInCategories(advertDto.getCategories());
-
         List<Category> categories = categoryRepository.findByCategoryNameIn(advertDto.getCategories());
         List<String> categoriesNames = categories.stream()
                 .map(Category::getCategoryName)
@@ -281,12 +287,6 @@ public class AdvertService implements IAdvertService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(advertDtoList, PageRequest.of(pageNumber, pageSize), adverts.getTotalElements());
-    }
-
-    private List<String> replaceCharsInCategories(List<String> categories) {
-        return categories.stream()
-                .map(category -> category.replace("_", " "))
-                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -359,6 +359,14 @@ public class AdvertService implements IAdvertService {
         advert.setBillingDetails(billingDetails);
 
         return billingDetailsMapper.toBillingDetailsDto(billingDetails);
+    }
+
+    @Override
+    public List<CommentDto> getAdvertComments(Long advertId) {
+        List<Comment> comments = commentRepository.getCommentsByAdvert_Id(advertId);
+        return comments.stream()
+                .map(commentMapper::commentToCommentDto)
+                .collect(Collectors.toList());
     }
 
     private Long generateBillingCount() {

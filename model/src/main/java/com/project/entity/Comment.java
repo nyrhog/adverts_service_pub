@@ -1,7 +1,9 @@
 package com.project.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
+@ToString
 public class Comment {
 
     @Id
@@ -18,10 +22,12 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
+    @ToString.Exclude
     private Profile profile;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advert_id")
+    @ToString.Exclude
     private Advert advert;
 
     @Column(name = "comment_text", nullable = false)

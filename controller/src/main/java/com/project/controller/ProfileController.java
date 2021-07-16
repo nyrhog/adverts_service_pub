@@ -1,6 +1,6 @@
 package com.project.controller;
 
-import com.project.Logging;
+import com.project.dto.GlobalResponseDto;
 import com.project.dto.ProfileDto;
 import com.project.dto.ProfileUpdateDto;
 import com.project.dto.RateDto;
@@ -22,10 +22,9 @@ public class ProfileController {
 
     @PatchMapping
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> updateProfile(@Valid @RequestBody ProfileUpdateDto updateDto) {
+    public ResponseEntity<GlobalResponseDto> updateProfile(@Valid @RequestBody ProfileUpdateDto updateDto) {
 
         profileService.updateProfile(updateDto);
-
         return ResponseEntity.ok().build();
     }
 
@@ -37,10 +36,11 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(@PathVariable Long id){
+    public ResponseEntity<GlobalResponseDto> getProfile(@PathVariable Long id){
 
         ProfileDto profile = profileService.getProfile(id);
-        return ResponseEntity.ok(profile);
+        GlobalResponseDto responseDto = new GlobalResponseDto(profile);
+        return ResponseEntity.ok(responseDto);
 
     }
 }

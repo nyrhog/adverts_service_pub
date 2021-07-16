@@ -1,0 +1,471 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: roles
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+  - changeSet:
+      id: 2
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: profiles
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: datetime(6)
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(15)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: surname
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: update_date
+                  type: datetime(6)
+  - changeSet:
+      id: 3
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: premium_adverts_details
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: premium_end
+                  type: datetime(6)
+              - column:
+                  name: premium_started
+                  type: datetime(6)
+  - changeSet:
+      id: 4
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: adverts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ad_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ad_price
+                  type: DOUBLE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: create_date
+                  type: datetime(6)
+              - column:
+                  name: update_date
+                  type: datetime(6)
+              - column:
+                  name: close_date
+                  type: datetime(6)
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: advert_premium_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: adverts_advertsPremium_fk
+                    referencedTableName: premium_adverts_details
+                    referencedColumnNames: id
+              - column:
+                  name: profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: adverts_profiles_fk
+                    referencedTableName: profiles
+                    referencedColumnNames: id
+  - changeSet:
+      id: 5
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: categories_categories_fk
+                    referencedTableName: categories
+                    referencedColumnNames: id
+  - changeSet:
+      id: 6
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: adverts_categories
+            columns:
+              - column:
+                  name: adverts_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: advertsCategories_adverts_fk
+                    referencedTableName: adverts
+                    referencedColumnNames: id
+              - column:
+                  name: category_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: adverts_categories_categories_fk
+                    referencedTableName: categories
+                    referencedColumnNames: id
+  - changeSet:
+      id: 7
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: billing_details
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: advert_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: billing_details_adverts_fk
+                    referencedTableName: adverts
+                    referencedColumnNames: id
+              - column:
+                  name: payment_count
+                  type: VARCHAR(255)
+              - column:
+                  name: days
+                  type: int
+              - column:
+                  name: price
+                  type: double
+  - changeSet:
+      id: 8
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: chats
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created
+                  type: datetime(6)
+  - changeSet:
+      id: 9
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: comments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: comment_text
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment_create
+                  type: datetime(6)
+              - column:
+                  name: comment_update
+                  type: datetime(6)
+              - column:
+                  name: comment_delete
+                  type: datetime(6)
+              - column:
+                  name: advert_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: comments_adverts_fk
+                    referencedTableName: adverts
+                    referencedColumnNames: id
+              - column:
+                  name: profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: comments_profiles_fk
+                    referencedTableName: profiles
+                    referencedColumnNames: id
+        - createIndex:
+            tableName: comments
+            columns:
+              - column:
+                  name: advert_id
+            indexName: idx_advert_id_comments
+        - createIndex:
+            tableName: comments
+            columns:
+              - column:
+                  name: profile_id
+            indexName: idx_profile_id_comments
+  - changeSet:
+      id: 10
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: messages
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: message_text
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message_write_time
+                  type: datetime(6)
+              - column:
+                  name: chat_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: chats_messages_fk
+                    referencedTableName: chats
+                    referencedColumnNames: id
+              - column:
+                  name: profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: chats_profiles_fk
+                    referencedTableName: profiles
+                    referencedColumnNames: id
+        - createIndex:
+            tableName: messages
+            columns:
+              - column:
+                  name: chat_id
+            indexName: idx_chat_id_messages
+        - createIndex:
+            tableName: comments
+            columns:
+              - column:
+                  name: profile_id
+            indexName: idx_profile_id_messages
+  - changeSet:
+      id: 11
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: ratings
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rating
+                  type: double
+                  constraints:
+                    nullable: false
+              - column:
+                  name: profile_id_recipient
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: profile_id_recipient_profiles_fk
+                    referencedTableName: profiles
+                    referencedColumnNames: id
+              - column:
+                  name: profile_id_sender
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: profile_id_sender_profiles_fk
+                    referencedTableName: profiles
+                    referencedColumnNames: id
+  - changeSet:
+      id: 12
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: profiles_chats
+            columns:
+              - column:
+                  name: profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: profiles_chats_profile_fk
+                    referencedTableName: profiles
+                    referencedColumnNames: id
+              - column:
+                  name: chat_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: profiles_chats_chat_fk
+                    referencedTableName: chats
+                    referencedColumnNames: id
+  - changeSet:
+      id: 13
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(40)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(15)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: username
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: users_profiles_fk
+                    referencedTableName: profiles
+                    referencedColumnNames: id
+              - column:
+                  name: generated_code
+                  type: int
+  - changeSet:
+      id: 14
+      author: nyrhog
+      changes:
+        - createTable:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: users_roles_users_fk
+                    referencedTableName: users
+                    referencedColumnNames: id
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: roles_roles_users_fk
+                    referencedTableName: roles
+                    referencedColumnNames: id

@@ -55,7 +55,6 @@ class AuthControllerTest {
     private IUserService userService;
 
     @BeforeAll
-    @Rollback(value = false)
     void init(){
         User user = new User();
 
@@ -84,7 +83,7 @@ class AuthControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(authenticationRequestDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("nyrhog"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.username").value("nyrhog"));
 
     }
 
@@ -115,7 +114,7 @@ class AuthControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/auth/restore-password?username=nyrhog")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         User user = userRepository.findByUsername("nyrhog").orElse(null);
 
@@ -138,7 +137,7 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restorePasswordDto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         user = userRepository.findByUsername("nyrhog").orElse(null);
 

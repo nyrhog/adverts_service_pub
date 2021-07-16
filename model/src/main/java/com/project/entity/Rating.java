@@ -1,7 +1,9 @@
 package com.project.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -9,11 +11,12 @@ import javax.persistence.*;
 @Table(name = "ratings")
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
+@ToString
 public class Rating {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rating_seq")
-    @SequenceGenerator(name = "rating_seq", sequenceName = "SEQ_RATING", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "rating")
@@ -21,6 +24,7 @@ public class Rating {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id_recipient")
+    @ToString.Exclude
     private Profile profileRecipient;
 
     @ManyToOne

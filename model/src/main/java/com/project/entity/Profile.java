@@ -1,7 +1,9 @@
 package com.project.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
@@ -17,11 +19,12 @@ import java.util.Objects;
 @Getter
 @Setter
 @Accessors(chain = true)
+@EqualsAndHashCode(of = "id")
+@ToString
 public class Profile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_seq")
-    @SequenceGenerator(name = "profile_seq", sequenceName = "SEQ_PROFILE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -47,6 +50,7 @@ public class Profile {
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "profile_id")
+    @ToString.Exclude
     private List<Advert> adverts = new ArrayList<>();
 
     @OneToMany(
@@ -54,6 +58,7 @@ public class Profile {
             cascade = {CascadeType.REMOVE},
             orphanRemoval = true
     )
+    @ToString.Exclude
     private List<Message> messages = new ArrayList<>();
 
     @OneToMany(
@@ -62,6 +67,7 @@ public class Profile {
             cascade = {CascadeType.REMOVE},
             orphanRemoval = true
     )
+    @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -70,9 +76,11 @@ public class Profile {
             joinColumns = {@JoinColumn(name = "profile_id")},
             inverseJoinColumns = {@JoinColumn(name = "chat_id")}
     )
+    @ToString.Exclude
     private List<Chat> chats = new ArrayList<>();
 
     @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private User user;
 
 }

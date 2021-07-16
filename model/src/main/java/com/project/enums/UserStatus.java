@@ -1,4 +1,4 @@
-package com.project.entity;
+package com.project.enums;
 
 public enum UserStatus {
 

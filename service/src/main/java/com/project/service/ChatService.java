@@ -10,6 +10,7 @@ import com.project.entity.Message;
 import com.project.entity.Profile;
 import com.project.exception.InvalidUserException;
 import com.project.mapper.ChatMapper;
+import com.project.mapper.MessageMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class ChatService implements IChatService {
     private final ProfileRepository profileRepository;
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
-    private final ChatMapper mapper;
+    private final ChatMapper chatMapper;
+    private final MessageMapper messageMapper;
 
     private static final String PROFILE_NOT_FOUND = "Profile with id: %s not found";
 
@@ -51,6 +53,10 @@ public class ChatService implements IChatService {
         Chat chat = new Chat();
         chat.setProfiles(List.of(chatCreator, recipient));
 
+        chatCreator.getChats().add(chat);
+        recipient.getChats().add(chat);
+
+        chatRepository.save(chat);
         return chat;
     }
 
@@ -141,7 +147,7 @@ public class ChatService implements IChatService {
         boolean contains = profile.getChats().contains(chat);
 
         if (contains){
-            return mapper.chatToChatDto(chat);
+            return chatMapper.chatToChatDto(chat);
         }
 
         throw new EntityNotFoundException("This profile doesn't have current chat");

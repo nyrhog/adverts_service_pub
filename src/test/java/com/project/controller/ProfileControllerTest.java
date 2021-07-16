@@ -131,7 +131,7 @@ class ProfileControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(rateDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         Profile profileSender = profileRepository.getById(1L);
         Profile profileRecipient = profileRepository.getById(2L);
@@ -151,10 +151,10 @@ class ProfileControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("asd"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname").value("asd"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value("123123123"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.name").value("asd"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.surname").value("asd"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.phoneNumber").value("123123123"));
 
     }
 }

@@ -5,6 +5,7 @@ import com.project.AdvertsServiceApplication;
 import com.project.dao.*;
 import com.project.dto.*;
 import com.project.entity.*;
+import com.project.enums.Status;
 import com.project.service.IUserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,21 +14,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -65,7 +61,6 @@ class AdvertControllerTest {
     }
 
     @BeforeAll
-    @Rollback(value = false)
     private void initBefore() {
         RegistrationDto requestDto = new RegistrationDto();
         requestDto.setFirstName("asd");
@@ -95,7 +90,12 @@ class AdvertControllerTest {
         advert.setAdPrice(123d);
         advert.setStatus(Status.ACTIVE);
         advert.setProfile(profile);
+        advert.setDescription("not null");
 
+        AdvertPremium advertPremium = new AdvertPremium();
+        advertPremium.setIsActive(false);
+
+        advert.setAdvertPremium(advertPremium);
         userService.register(user);
         advertRepository.save(advert);
         categoryRepository.save(category);
@@ -159,7 +159,7 @@ class AdvertControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/adverts/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         Assertions.assertEquals(0, advertRepository.findAll().size());
     }
@@ -178,7 +178,7 @@ class AdvertControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(commentaryDto)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         Advert advert = advertRepository.findById(id).orElse(null);
         List<Comment> all = commentRepository.findAll();
@@ -195,6 +195,7 @@ class AdvertControllerTest {
         Comment comment = new Comment();
         comment.setCommentText("text");
         comment.setProfile(profile);
+        comment.setAdvert(advert);
         comment = commentRepository.save(comment);
 
         EditCommentDto dto = new EditCommentDto();
@@ -227,7 +228,7 @@ class AdvertControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/adverts/comment?id=" + comment.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         Assertions.assertEquals(0, commentRepository.findAll().size());
     }
@@ -240,9 +241,9 @@ class AdvertControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(advert.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.adName").value("ad"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.adPrice").value(123d));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(advert.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.adName").value("ad"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.adPrice").value(123d));
 
     }
 

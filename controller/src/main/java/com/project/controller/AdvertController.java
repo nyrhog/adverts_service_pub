@@ -1,6 +1,5 @@
 package com.project.controller;
 
-import com.project.Logging;
 import com.project.dto.*;
 import com.project.service.IAdvertService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +33,7 @@ public class AdvertController {
     public ResponseEntity<Void> updateAdvert(@RequestBody UpdateAdvertDto updateAdvertDto) {
 
         advertService.updateAdvert(updateAdvertDto);
+
         return ResponseEntity.ok().build();
     }
 
@@ -46,7 +46,7 @@ public class AdvertController {
     }
 
     @PatchMapping("/close/{id}")
-    public ResponseEntity<Void> closeAdvert(@PathVariable Long id){
+    public ResponseEntity<Void> closeAdvert(@PathVariable Long id) {
         advertService.closeAdvert(id);
         return ResponseEntity.ok().build();
     }
@@ -59,11 +59,20 @@ public class AdvertController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/comment/{id}")
+    public ResponseEntity<GlobalResponseDto> getComment(@PathVariable Long id) {
+
+        CommentDto comment = advertService.getComment(id);
+        GlobalResponseDto responseDto = new GlobalResponseDto(comment);
+
+        return ResponseEntity.ok(responseDto);
+    }
+
     @PostMapping("/comment")
     public ResponseEntity<Void> addComment(@Valid @RequestBody CommentaryDto commentaryDto) {
 
         advertService.addCommentaryToAdvert(commentaryDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
@@ -103,25 +112,40 @@ public class AdvertController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AdvertDto> getAdvert(@PathVariable Long id) {
+    public ResponseEntity<GlobalResponseDto> getAdvert(@PathVariable Long id) {
         AdvertDto advert = advertService.getOneAdvert(id);
+        GlobalResponseDto responseDto = new GlobalResponseDto();
+        responseDto.setData(advert);
 
-        return new ResponseEntity<>(advert, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @GetMapping("/billing")
-    public ResponseEntity<BillingDetailsDto> getBillingDetails(@RequestParam Long advertId,
-                                                              @Valid @Min(3) @Max(14) @RequestParam Integer days){
+    public ResponseEntity<GlobalResponseDto> getBillingDetails(@RequestParam Long advertId,
+                                                               @Valid @Min(3) @Max(14) @RequestParam Integer days) {
 
         BillingDetailsDto billingDetails = advertService.getBillingDetails(advertId, days);
-        return new ResponseEntity<>(billingDetails, HttpStatus.OK);
+        GlobalResponseDto responseDto = new GlobalResponseDto();
+        responseDto.setData(billingDetails);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
 
     }
 
     @GetMapping("/profile/{id}")
-    public ResponseEntity<List<AdvertDto>> getProfileAdverts(@PathVariable Long id){
+    public ResponseEntity<GlobalResponseDto> getProfileAdverts(@PathVariable Long id) {
         List<AdvertDto> profileActiveAdverts = advertService.getProfileActiveAdverts(id);
+        GlobalResponseDto responseDto = new GlobalResponseDto();
+        responseDto.setData(profileActiveAdverts);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(profileActiveAdverts, HttpStatus.OK);
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<GlobalResponseDto> getAdvertComments(@PathVariable Long id) {
+
+        List<CommentDto> advertComments = advertService.getAdvertComments(id);
+
+        GlobalResponseDto responseDto = new GlobalResponseDto();
+        responseDto.setData(advertComments);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }

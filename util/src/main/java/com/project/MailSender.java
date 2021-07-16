@@ -1,15 +1,14 @@
 package com.project;
 
-import lombok.SneakyThrows;
+import com.project.exception.MessageSenderException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.*;
 import java.util.Properties;
 
+@Slf4j
 public class MailSender {
 
     @Value("${email}")
@@ -33,8 +32,8 @@ public class MailSender {
     @Value("${mail.smtp.socketFactory.class}")
     private String socketFactoryClass;
 
-    @SneakyThrows
-    public void send(String email, String text, String title) {
+
+    public void send(String email, String text, String title)  {
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", host);
@@ -49,19 +48,24 @@ public class MailSender {
             }
         });
 
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(sendingEmail));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
-        message.setSubject(title);
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(sendingEmail));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+            message.setSubject(title);
 
-        MimeBodyPart mimeBodyPart = new MimeBodyPart();
-        mimeBodyPart.setContent(text, "text/html");
+            MimeBodyPart mimeBodyPart = new MimeBodyPart();
+            mimeBodyPart.setContent(text, "text/html");
 
-        Multipart multipart = new MimeMultipart();
-        multipart.addBodyPart(mimeBodyPart);
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPart);
 
-        message.setContent(multipart);
-        Transport.send(message);
+            message.setContent(multipart);
+            Transport.send(message);
+        } catch (MessagingException e){
+            log.error("Message can't send " + e.getMessage());
+            throw new MessageSenderException(e);
+        }
     }
 }
 

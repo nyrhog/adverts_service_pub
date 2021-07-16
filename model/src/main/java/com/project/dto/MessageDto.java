@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class MessageDto {
 
     private Long id;
-    private ProfileDto profile;
+    private Long creatorProfileId;
     private LocalDateTime writeTime;
     private String text;
 

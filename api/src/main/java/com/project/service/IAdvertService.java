@@ -17,6 +17,7 @@ public interface IAdvertService {
     Advert closeAdvert(Long id);
     List<AdvertDto> getProfileActiveAdverts(Long id);
     AdvertPremium enablePremiumStatus(Long advertId);
+    CommentDto getComment(Long id);
     Comment addCommentaryToAdvert(CommentaryDto commentaryDto);
     void deleteComment(Long commentId);
     Comment editComment(EditCommentDto editCommentDto);
@@ -24,5 +25,6 @@ public interface IAdvertService {
     Page<AdvertDto> sellingHistory(Long profileId, Integer page, Integer size);
     AdvertDto getOneAdvert(Long advertId);
     BillingDetailsDto getBillingDetails(Long id, Integer days);
+    List<CommentDto> getAdvertComments(Long advertId);
 
 }

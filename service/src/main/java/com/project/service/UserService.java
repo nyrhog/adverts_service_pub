@@ -5,9 +5,10 @@ import com.project.Logging;
 import com.project.MailSender;
 import com.project.dao.RoleRepository;
 import com.project.dao.UserRepository;
+import com.project.entity.Profile;
 import com.project.entity.Role;
 import com.project.entity.User;
-import com.project.entity.UserStatus;
+import com.project.enums.UserStatus;
 import com.project.exception.WrongRestoreCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,10 @@ public class UserService implements IUserService {
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
 
-        return registerUser(user, userRoles);
+        User registerUser = registerUser(user, userRoles);
+        Profile profile = registerUser.getProfile();
+
+        return registerUser;
     }
 
     @Override

@@ -7,6 +7,8 @@ import com.project.dao.RoleRepository;
 import com.project.dao.UserRepository;
 import com.project.dto.RegistrationDto;
 import com.project.entity.*;
+import com.project.enums.Status;
+import com.project.service.IUserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(SpringExtension.class)
@@ -44,15 +40,17 @@ class AdminControllerTest {
     private final AdvertRepository advertRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final IUserService userService;
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    public AdminControllerTest(AdvertRepository advertRepository, RoleRepository roleRepository, UserRepository userRepository) {
+    public AdminControllerTest(AdvertRepository advertRepository, RoleRepository roleRepository, UserRepository userRepository, IUserService userService) {
         this.advertRepository = advertRepository;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Test
@@ -66,16 +64,13 @@ class AdminControllerTest {
         registrationDto.setSurname("Kananovich");
         registrationDto.setPhoneNumber("335553535");
 
-        Role roleAdmin = new Role();
-        roleAdmin.setName("ROLE_ADMIN");
-
-        roleRepository.save(roleAdmin);
+        saveRoles();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/admin/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registrationDto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         User user = userRepository.findByUsername("nyrhog").orElse(null);
 
@@ -83,9 +78,42 @@ class AdminControllerTest {
         Assertions.assertTrue(user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")));
     }
 
+    private void saveRoles(){
+        Role roleAdmin = new Role();
+        Role roleUser = new Role();
+        roleUser.setName("ROLE_USER");
+        roleAdmin.setName("ROLE_ADMIN");
+
+        roleRepository.save(roleAdmin);
+        roleRepository.save(roleUser);
+    }
+
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "ADMIN")
     void enablePremStatus() throws Exception {
+
+        saveRoles();
+        RegistrationDto registrationDto = new RegistrationDto();
+        registrationDto.setUsername("nyrhog");
+        registrationDto.setPassword("test");
+        registrationDto.setEmail("test@gmail.com");
+        registrationDto.setFirstName("Kirill");
+        registrationDto.setSurname("Kananovich");
+        registrationDto.setPhoneNumber("335553535");
+
+        User user = new User();
+
+        Profile profile = new Profile()
+                .setName(registrationDto.getFirstName())
+                .setPhoneNumber(registrationDto.getPhoneNumber())
+                .setSurname(registrationDto.getSurname());
+
+        user.setPassword(registrationDto.getPassword())
+                .setUsername(registrationDto.getUsername())
+                .setEmail(registrationDto.getEmail())
+                .setProfile(profile);
+
+        User adminUser = userService.registerAdminUser(user);
 
         AdvertPremium advertPremium = new AdvertPremium();
 
@@ -93,17 +121,20 @@ class AdminControllerTest {
         advert.setAdName("ad");
         advert.setAdPrice(123d);
         advert.setStatus(Status.ACTIVE);
+        advert.setDescription("Not null");
         advert.setAdvertPremium(advertPremium);
+        advert.setProfile(adminUser.getProfile());
+        advert = advertRepository.save(advert);
 
         BillingDetails billingDetails = new BillingDetails();
         billingDetails.setDays(4);
-        advert.setBillingDetails(billingDetails);
+        billingDetails.setAdvert(advert);
 
-        advert = advertRepository.save(advert);
+        advert.setBillingDetails(billingDetails);
         mockMvc.perform(MockMvcRequestBuilders.patch("/admin/premium/" + advert.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         advert = advertRepository.getById(advert.getId());
         Assertions.assertTrue(advert.getAdvertPremium().getIsActive());

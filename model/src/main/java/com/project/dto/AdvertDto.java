@@ -1,6 +1,6 @@
 package com.project.dto;
 
-import com.project.entity.Status;
+import com.project.enums.Status;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 public class AdvertDto {
 
     private Long id;
-    private ProfileDto profile;
+    private Long creatorProfileId;
     private String adName;
     private Double adPrice;
     private String description;
@@ -18,7 +18,5 @@ public class AdvertDto {
     private LocalDateTime updated;
     private LocalDateTime closed;
     private List<CategoryDto> categories;
-    private List<CommentDto> comments;
-
 
 }

@@ -67,7 +67,6 @@ class ChatControllerTest {
     }
 
     @BeforeAll
-    @Rollback(value = false)
     private void initBefore() {
         RegistrationDto requestDto = new RegistrationDto();
         requestDto.setFirstName("asd");
@@ -102,7 +101,7 @@ class ChatControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createChatDto)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         Chat chat = chatRepository.getChatByProfilesIdIn(1L, 2L);
         Assertions.assertNotNull(chat);
@@ -118,11 +117,11 @@ class ChatControllerTest {
 
         createTestChat();
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/chats/message")
+        mockMvc.perform(MockMvcRequestBuilders.post("/chats/messages")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sendMessageDto)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isCreated());
 
         List<Message> messages = messageRepository.findAll();
 

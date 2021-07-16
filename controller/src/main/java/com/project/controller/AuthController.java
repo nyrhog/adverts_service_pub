@@ -1,11 +1,7 @@
 package com.project.controller;
 
 
-import com.project.Logging;
-import com.project.dto.AuthenticationRequestDto;
-import com.project.dto.RegistrationDto;
-import com.project.dto.ResponseDto;
-import com.project.dto.RestorePasswordDto;
+import com.project.dto.*;
 import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.jwt.JwtTokenProvider;
@@ -18,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 
 @RestController
@@ -30,8 +25,9 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final IUserService userService;
 
+
     @PostMapping("/login")
-    public ResponseEntity<ResponseDto> login(@Valid @RequestBody AuthenticationRequestDto requestDto) {
+    public ResponseEntity<GlobalResponseDto> login(@Valid @RequestBody AuthenticationRequestDto requestDto) {
 
         String username = requestDto.getUsername();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
@@ -43,7 +39,9 @@ public class AuthController {
         response.setToken(token);
         response.setUsername(username);
 
-        return ResponseEntity.ok(response);
+        GlobalResponseDto responseDto = new GlobalResponseDto(response);
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/registration")
@@ -71,6 +69,8 @@ public class AuthController {
         userService.sendMessageWithCode(username);
         return ResponseEntity.ok().build();
     }
+
+
 
     @PatchMapping("/restore-password")
     public ResponseEntity<Void> restorePassword(@RequestBody RestorePasswordDto dto){

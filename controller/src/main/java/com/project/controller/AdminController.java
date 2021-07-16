@@ -1,6 +1,9 @@
 package com.project.controller;
 
+import com.project.dto.AdvertPremiumDto;
+import com.project.dto.GlobalResponseDto;
 import com.project.dto.RegistrationDto;
+import com.project.entity.AdvertPremium;
 import com.project.entity.Profile;
 import com.project.entity.User;
 import com.project.service.IAdvertService;
@@ -8,10 +11,10 @@ import com.project.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/admin")
@@ -36,18 +39,13 @@ public class AdminController{
                 .setEmail(registrationDto.getEmail())
                 .setProfile(profile);
 
-
-        userService.registerAdminUser(user);
-
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping("/premium/{id}")
-    public ResponseEntity<Void> enablePremiumAdvert(@PathVariable Long id) {
+    public ResponseEntity<GlobalResponseDto> enablePremiumAdvert(@PathVariable Long id) {
 
         advertService.enablePremiumStatus(id);
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build() ;
     }
-
 }

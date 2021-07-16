@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AdvertMapper {
+
+    @Mapping(target = "creatorProfileId", source = "advert.profile.id")
     AdvertDto toAdvertDto(Advert advert);
 
     @Mapping(target = "advert.adName", source = "dto.adName", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -1,7 +1,10 @@
 package com.project.entity;
 
+import com.project.enums.UserStatus;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -12,11 +15,12 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
+@EqualsAndHashCode(of = "id")
+@ToString
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
-    @SequenceGenerator(name = "user_seq", sequenceName = "SEQ_USER", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "username", nullable = false, unique = true)
@@ -34,6 +38,7 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
+    @ToString.Exclude
     private Profile profile;
 
     @ManyToMany(fetch = FetchType.EAGER)

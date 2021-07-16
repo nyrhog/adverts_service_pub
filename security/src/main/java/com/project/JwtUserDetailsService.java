@@ -1,7 +1,7 @@
 package com.project;
 
 import com.project.entity.User;
-import com.project.entity.UserStatus;
+import com.project.enums.UserStatus;
 import com.project.jwt.JwtAuthenticationException;
 import com.project.jwt.JwtUser;
 import com.project.jwt.JwtUserFactory;

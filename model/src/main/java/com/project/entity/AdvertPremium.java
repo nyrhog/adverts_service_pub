@@ -1,24 +1,26 @@
 package com.project.entity;
 
 import com.project.support.BooleanToStringConverter;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Type;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "premium_adverts_details")
 @Getter
 @Setter
 @Accessors(chain = true)
+@EqualsAndHashCode(of = "id")
+@ToString
 public class AdvertPremium {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "adverts_premium_seq")
-    @SequenceGenerator(name = "adverts_premium_seq", sequenceName = "SEQ_ADVERTS_PREMIUM", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "is_active", nullable = false)

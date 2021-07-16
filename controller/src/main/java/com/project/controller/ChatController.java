@@ -1,6 +1,5 @@
 package com.project.controller;
 
-import com.project.Logging;
 import com.project.dto.*;
 import com.project.service.IChatService;
 import lombok.RequiredArgsConstructor;
@@ -24,22 +23,24 @@ public class ChatController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping("/message")
+    @PostMapping("/messages")
     public ResponseEntity<Void> sendMessage(@RequestBody @Valid SendMessageDto sendMessageDto){
 
         chatService.sendMessage(sendMessageDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ChatDto> getChat(@PathVariable Long id){
+    public ResponseEntity<GlobalResponseDto> getChat(@PathVariable Long id){
 
         ChatDto chat = chatService.getChat(id);
-        return ResponseEntity.ok(chat);
+        GlobalResponseDto globalResponseDto = new GlobalResponseDto(chat);
+        return ResponseEntity.ok(globalResponseDto);
     }
 
+
     @PatchMapping
-    public ResponseEntity<Void> updateMessage(@RequestBody @Valid UpdateMessageDto dto){
+    public ResponseEntity<GlobalResponseDto> updateMessage(@RequestBody @Valid UpdateMessageDto dto){
 
         chatService.updateMessage(dto);
         return ResponseEntity.ok().build();

@@ -2,7 +2,7 @@ package com.project.dao;
 
 import com.project.entity.Advert;
 import com.project.entity.Profile;
-import com.project.entity.Status;
+import com.project.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

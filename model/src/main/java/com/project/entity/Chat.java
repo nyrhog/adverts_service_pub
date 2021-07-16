@@ -1,7 +1,9 @@
 package com.project.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,11 +13,13 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name = "chats")
+@EqualsAndHashCode(of = "id")
+@ToString
 public class Chat {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chat_seq")
-    @SequenceGenerator(name = "chat_seq", sequenceName = "SEQ_CHAT", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(
@@ -23,9 +27,11 @@ public class Chat {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @ToString.Exclude
     private List<Message> messages = new ArrayList<>();
 
     @ManyToMany(mappedBy = "chats", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<Profile> profiles = new ArrayList<>();
 
     @org.hibernate.annotations.CreationTimestamp

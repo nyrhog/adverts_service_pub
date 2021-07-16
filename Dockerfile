@@ -6,6 +6,7 @@
 
 FROM openjdk:16-alpine3.13
 #VOLUME /tmp
+ENV TZ="Europe/Moscow"
 COPY build/libs/adverts_service-0.0.1-SNAPSHOT.jar adverts_service-0.0.1-SNAPSHOT.jar
 EXPOSE 8080
 
